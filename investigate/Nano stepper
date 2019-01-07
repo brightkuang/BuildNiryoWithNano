@@ -1,0 +1,10 @@
+ *    Niryo AS5600 Position sensor 
+
+ #define AS5600_ADDRESS 0x36 (I2C)
+ 
+ *    Nano AS5047D Position sensor
+
+#define PIN_AS5047D_CS  (16) //analogInputToDigitalPin(PIN_A2))
+#ifndef MECHADUINO_HARDWARE
+#define PIN_AS5047D_PWR	(11) //pull low to power on AS5047D
+#endif
