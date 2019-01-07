@@ -10,12 +10,12 @@
  *    Nano AS5047D Position sensor
 
 
-SPI.transfer16(AS5047D_CMD_NOP)    (0x0000)
+SPI.transfer16(AS5047D_CMD_NOP)    (0x0000)  No operation
 
-readAddress(AS5047D_CMD_DIAAGC)    (0x3FFC)
-readAddress(AS5047D_CMD_MAG)       (0x3FFD)
-readAddress(AS5047D_CMD_ANGLEUNC)  (0x3FFE)
-readAddress(AS5047D_CMD_ANGLECOM)  (0x3FFF)
+readAddress(AS5047D_CMD_DIAAGC)    (0x3FFC)  Diagnostic and AGC
+readAddress(AS5047D_CMD_MAG)       (0x3FFD)  CORDIC magnitude
+readAddress(AS5047D_CMD_ANGLEUNC)  (0x3FFE)  Measured angle without dynamic angle error compensation
+readAddress(AS5047D_CMD_ANGLECOM)  (0x3FFF)  Measured angle with dynamic angle error compensation
 
 static int getBit(int16_t data, int bit)
 static int getParity(uint16_t data)
