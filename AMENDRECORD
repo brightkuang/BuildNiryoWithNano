@@ -1,0 +1,7 @@
+~/niryo_stepper-master/config.h
+
+//Defines for pins:
+#define IN_1  15 -> 8
+#define IN_2  17 -> 7
+#define IN_3  3  -> 5
+#define IN_4  8  -> 6

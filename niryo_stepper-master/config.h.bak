@@ -102,7 +102,7 @@
 #define UMAX_PID     UMAX_50_PERCENT
 
 #define spr 200   
-#define aps 360.0/ spr       // angle per step (1.8)
+#define aps 360.0/ spr       // angle per step
 
 /*
  *    ----------- CAN bus -------------
