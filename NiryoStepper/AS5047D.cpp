@@ -22,11 +22,9 @@
 
  *********************************************************************/
 #include <Arduino.h>
-#include "syslog.h"
 #include "as5047d.h"
 #include "SPI.h"
 #include <stdio.h>
-#include "board.h"
 
 #define AS5047D_CMD_NOP   (0x0000)
 #define AS5047D_CMD_ERRFL (0x0001)
@@ -305,4 +303,3 @@ void AS5047D::diagnostics(char *ptrStr)
 }
 
 #pragma GCC pop_options
-
