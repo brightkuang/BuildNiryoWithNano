@@ -67,11 +67,8 @@ static int getParity(uint16_t data)
 	return (bits & 0x01); //return 1 if odd
 }
 
-boolean AS5047D::begin(int csPin)
+void init_position_sensor()
 {
-#ifdef PIN_AS5047D_PWR
-	digitalWrite(PIN_AS5047D_PWR,HIGH);
-#endif
 	digitalWrite(PIN_AS5047D_CS,LOW); //pull CS LOW by default (chip powered off)
 	digitalWrite(PIN_MOSI,LOW);
 	digitalWrite(PIN_SCK,LOW);
@@ -79,24 +76,17 @@ boolean AS5047D::begin(int csPin)
 	pinMode(PIN_MISO,OUTPUT);
 	delay(1000);
 
-
-	digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high
-#ifdef PIN_AS5047D_PWR
-	digitalWrite(PIN_AS5047D_PWR,LOW);
-#endif
-
+	digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS hig
+  
 	pinMode(PIN_MISO,INPUT);
 
 	error=false;
-	SPISettings settingsA(5000000, MSBFIRST, SPI_MODE1);             ///400000, MSBFIRST, SPI_MODE1);
-	chipSelectPin=csPin;
+	SPISettings settingsA(5000000, MSBFIRST, SPI_MODE1);   //400000, MSBFIRST, SPI_MODE1;
 
-	LOG("csPin is %d",csPin);
-	pinMode(chipSelectPin,OUTPUT);
-	digitalWrite(chipSelectPin,HIGH); //pull CS high by default
+	pinMode(PIN_AS5047D_CS,OUTPUT);
+	digitalWrite(PIN_AS5047D_CS,HIGH);                     //pull CS high by default
 	delay(1);
-	SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
-	LOG("Begin AS5047D...");
+	SPI.begin();                                          //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
 
 	SPI.beginTransaction(settingsA);
 	SPI.transfer16(AS5047D_CMD_NOP);
@@ -115,7 +105,6 @@ boolean AS5047D::begin(int csPin)
 			break;
 			//return false;
 		}
-		LOG("AS5047D diag data is 0x%04X",data);
 		data=readAddress(AS5047D_CMD_DIAAGC);
 	}
 
@@ -137,15 +126,7 @@ boolean AS5047D::begin(int csPin)
 			LOG("AS5048A diag data is 0x%04X",data);
 		}
 		as5047d=false;
-
 	}
-
-
-#ifdef NZS_AS5047_PIPELINE
-	//read encoder a few times to flush the pipeline
-	readEncoderAnglePipeLineRead();
-	readEncoderAnglePipeLineRead();
-#endif
 	return true;
 }
 
