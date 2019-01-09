@@ -42,6 +42,8 @@
 #define AS5048A_CMD_MAG    (0x3FFE)
 #define AS5048A_CMD_ANGLE  (0x3FFF)
 
+#define RD  0x40    // bit 14 "1" is Read + parity even
+
 #pragma GCC push_options
 #pragma GCC optimize ("-Ofast")
 
@@ -281,6 +283,95 @@ void AS5047D::diagnostics(char *ptrStr)
 		sprintf(ptrStr,"%sAngle: %d\n\r", ptrStr,data);
 	}
 
+}
+
+// ************************Write to AS5047D **************************
+void AS5047D_Write( int SSPin, int address, int value)
+{
+  // take the SS pin low to select the chip:
+  digitalWrite(SSPin, LOW);
+  
+  Serial.println(value, HEX);
+  
+  //  send in the address via SPI:
+  
+  byte v_l = address & 0x00FF;
+  byte v_h = (unsigned int)(address & 0x3F00) >> 8;
+  
+  if (parity(address & 0x3F) == 1) v_h = v_h | 0x80; // set parity bit
+
+  SPI.transfer(v_h);
+  SPI.transfer(v_l);
+  
+  digitalWrite(SSPin, HIGH);
+  
+  delay(2);
+  
+  digitalWrite(SSPin, LOW);
+  
+  //  send value via SPI:
+  
+  v_l = value & 0x00FF;
+  v_h = (unsigned int)(value & 0x3F00) >> 8;
+  
+  if (parity(value & 0x3F) == 1) v_h = v_h | 0x80; // set parity bit
+  
+  SPI.transfer(v_h);
+  SPI.transfer(v_l);
+  
+  // take the SS pin high to de-select the chip:
+  digitalWrite(SSPin, HIGH);
+}
+
+//*******************Read from AS5047D ********************************
+unsigned int AS5047D_Read( int SSPin, unsigned int address)
+{
+  unsigned int result = 0;   // result to return
+  
+  byte res_h = 0;
+  byte res_l = 0;
+  
+  // take the SS pin low to select the chip:
+  digitalWrite(SSPin, LOW);
+  
+  //  send in the address and value via SPI:
+  byte v_l = address & 0x00FF;
+  byte v_h = (unsigned int)(address & 0x3F00) >> 8;
+  
+  if (parity(address | (RD << 8)) == 1) v_h = v_h | 0x80; // set parity bit
+  
+  v_h = v_h | RD; // its  a read command
+  
+  res_h = SPI.transfer(v_h);
+  res_l = SPI.transfer(v_l);
+  
+  digitalWrite(SSPin, HIGH);
+  
+  delay(2);
+  
+  digitalWrite(SSPin, LOW);
+  
+  //if (parity(0x00 | (RD <<8))==1) res_h = res_h | 0x80;  // set parity bit
+  //res_h = res_h | RD;
+  
+  res_h = (SPI.transfer(0x00));
+  res_l = SPI.transfer(0x00);
+  
+  res_h = res_h & 0x3F;  // filter bits outside data
+  
+  digitalWrite(SSPin, HIGH);
+  
+  return (result = (res_h << 8) | res_l);
+}
+
+//*******************check parity ******************************************
+int parity(unsigned int x) {
+  int parity = 0;
+  while (x > 0) {
+    parity = (parity + (x & 1)) % 2;
+    x >>= 1;
+  }
+  return (parity);
 }
 
 #pragma GCC pop_options
