@@ -47,7 +47,7 @@
 #include "config.h"
 #include "utils.h"
 #include "A4954.h"
-#include "AS5600.h"
+#include "AS5047D.h"
 #include "StepperController.h"
 #include "CanBus.h"
 
@@ -121,7 +121,7 @@ void setup() {
   //speed_up_position_sensor_response_time();
 
   // set register to read once
-  init_position_sensor();
+  AS5047D_setup();
 
   // setup pins for motor driver
   init_driver();
@@ -206,4 +206,3 @@ void loop() {
     debug_serial();
   }
 }
-
