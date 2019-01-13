@@ -35,14 +35,6 @@
 #define AS5047D_CMD_ANGLEUNC (0x3FFE)
 #define AS5047D_CMD_ANGLECOM (0x3FFF)
 
-
-#define AS5048A_CMD_NOP   (0x0000)
-#define AS5048A_CMD_ERRFL (0x0001)
-#define AS5048A_CMD_PROG  (0x0003)
-#define AS5048A_CMD_DIAAGC (0x3FFD)
-#define AS5048A_CMD_MAG    (0x3FFE)
-#define AS5048A_CMD_ANGLE  (0x3FFF)
-
 #define RD  0x40    // bit 14 "1" is Read + parity even
 
 #pragma GCC push_options
@@ -88,19 +80,19 @@ void update_current_position(int microsteps)
   sensor_position = read_encoder();
 
   // check if motor did one rotation
-  if (sensor_position - last_sensor_position < - AS5600_CPR_HALF) {
+  if (sensor_position - last_sensor_position < - AS5047D_CPR_HALF) {
     ++motor_rotation_count;
   }
-  else if (sensor_position - last_sensor_position > AS5600_CPR_HALF) {
+  else if (sensor_position - last_sensor_position > AS5047D_CPR_HALF) {
     --motor_rotation_count;
   }
 
   // get total sensor position
-  sensor_position_with_rotations = sensor_position + AS5600_CPR * motor_rotation_count;
+  sensor_position_with_rotations = sensor_position + AS5047D_CPR * motor_rotation_count;
   last_sensor_position = sensor_position;
 
   // translate sensor position to motor micro steps
-  motor_position_without_offset = (sensor_position_with_rotations * microsteps * STEPPER_CPR) / AS5600_CPR;
+  motor_position_without_offset = (sensor_position_with_rotations * microsteps * STEPPER_CPR) / AS5047D_CPR;
   motor_position_steps =  motor_position_without_offset - offset;
 }
 

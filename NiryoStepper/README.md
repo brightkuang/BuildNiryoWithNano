@@ -1,7 +1,7 @@
 # NiryoStepper firmware 
 
 Firmware to control a stepper motor with the custom Niryo Arduino-compatible board.
-This board has a magnetic sensor (AS5600) to measure precisely the position of the stepper motor.
+This board has a magnetic sensor (AS5047D) to measure precisely the position of the stepper motor.
   
 Communication interface : CAN bus (using MCP2515 to make an SPI-CAN interface)
   

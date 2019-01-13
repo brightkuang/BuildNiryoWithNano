@@ -1,7 +1,3 @@
- *    Niryo AS5600 Position sensor 
-
- #define AS5600_ADDRESS 0x36 (I2C)
- 
  void init_position_sensor()
  void speed_up_position_sensor_response_time()
  int read_encoder()

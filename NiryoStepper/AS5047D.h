@@ -1,11 +1,11 @@
-/**********************************************************************
- *      Author: tstern
- *
-	Copyright (C) 2018  MisfitTech,  All rights reserved.
+/*
+    AS5047D.h
+    Copyright (C) 2017 Niryo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License.
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,32 +13,29 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
-    Written by Trampas Stern for MisfitTech.
-
-    Misfit Tech invests time and resources providing this open source code,
-    please support MisfitTech and open-source hardware by purchasing
-	products from MisfitTech, www.misifittech.net!
- *********************************************************************/
-#ifndef __AS5047D_H__
-#define __AS5047D_H__
-
+#include "config.h"
 #include <Arduino.h>
-#define AS5047D_DEGREES_PER_BIT  (360.0/(float)(0x3FFF))
+#include <Wire.h>
 
-class AS5047D {
-  private:
-    int chipSelectPin;
-    int16_t readAddress(uint16_t addr);
-    bool error=false;
-    bool as5047d=true;
-  public:
-    boolean begin(int csPin);
-    int16_t readEncoderAngle(void);
-    void diagnostics(char *ptrStr);
-    int16_t readEncoderAnglePipeLineRead(void);
-    bool getError(void) {return error;};
-};
+extern volatile long sensor_position;
+extern volatile long last_sensor_position;
+extern volatile long sensor_position_with_rotations;
+extern volatile long motor_rotation_count;
 
-#endif //__AS5047D_H__
+extern volatile long motor_position_without_offset;
+extern volatile long motor_position_steps;
+
+extern volatile long offset;
+
+void AS5047D_setup();
+int read_encoder();
+
+void update_current_position(int microsteps);
+
+void AS5047D_Write( int SSPin, int address, int value);
+unsigned int AS5047D_Read( int SSPin, unsigned int address);
+
+int parity(unsigned int x);
