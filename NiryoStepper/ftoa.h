@@ -1,7 +1,9 @@
-/**********************************************************************
- *      Author: tstern
+/*
+ * ftoa.h
  *
-	Copyright (C) 2018  MisfitTech,  All rights reserved.
+ *  Created on: Jan 6, 2017
+ *      Author: tstern
+ *      	Copyright (C) 2018  MisfitTech,  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,26 +22,15 @@
     Misfit Tech invests time and resources providing this open source code,
     please support MisfitTech and open-source hardware by purchasing
 	products from MisfitTech, www.misifittech.net!
- *********************************************************************/
+ */
 
-#include "utils.h"
-#include "syslog.h"
+#ifndef FTOA_H_
+#define FTOA_H_
 
-double CubicInterpolate(
-   double y0,double y1,
-   double y2,double y3,
-   double mu)
-{
-   double a0,a1,a2,a3,mu2;
+#define MAX_MANTISA (1000)
 
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
-
-   return(a0*mu*mu2+a1*mu2+a2*mu+a3);
-}
+int ftoa (float x, char *str, char  prec, char format);
 
 
 
+#endif /* FTOA_H_ */

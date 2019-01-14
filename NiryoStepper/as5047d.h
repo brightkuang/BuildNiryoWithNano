@@ -21,25 +21,24 @@
     please support MisfitTech and open-source hardware by purchasing
 	products from MisfitTech, www.misifittech.net!
  *********************************************************************/
+#ifndef __AS5047D_H__
+#define __AS5047D_H__
 
-#include "utils.h"
-#include "syslog.h"
+#include <Arduino.h>
+#define AS5047D_DEGREES_PER_BIT  (360.0/(float)(0x3FFF))
 
-double CubicInterpolate(
-   double y0,double y1,
-   double y2,double y3,
-   double mu)
-{
-   double a0,a1,a2,a3,mu2;
+class AS5047D {
+  private:
+    int chipSelectPin;
+    int16_t readAddress(uint16_t addr);
+    bool error=false;
+    bool as5047d=true;
+  public:
+    boolean begin(int csPin);
+    int16_t readEncoderAngle(void);
+    void diagnostics(char *ptrStr);
+    int16_t readEncoderAnglePipeLineRead(void);
+    bool getError(void) {return error;};
+};
 
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
-
-   return(a0*mu*mu2+a1*mu2+a2*mu+a3);
-}
-
-
-
+#endif //__AS5047D_H__

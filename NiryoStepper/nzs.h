@@ -1,5 +1,8 @@
-/**********************************************************************
- *      Author: tstern
+/*
+ * nzs.h
+ *
+ *  Created on: Dec 8, 2016
+ *      Author: trampas
  *
 	Copyright (C) 2018  MisfitTech,  All rights reserved.
 
@@ -22,24 +25,29 @@
 	products from MisfitTech, www.misifittech.net!
  *********************************************************************/
 
-#include "utils.h"
-#include "syslog.h"
+#ifndef NZS_H_
+#define NZS_H_
 
-double CubicInterpolate(
-   double y0,double y1,
-   double y2,double y3,
-   double mu)
+#include "board.h"
+#include "nzs_lcd.h"
+#include "stepper_controller.h"
+#include "planner.h"
+
+typedef struct
 {
-   double a0,a1,a2,a3,mu2;
+	int64_t angle;
+	uint16_t encoderAngle;
+	uint8_t valid;
+}eepromData_t;
 
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
+class NZS //nano Zero Stepper
+{
 
-   return(a0*mu*mu2+a1*mu2+a2*mu+a3);
-}
+	public:
+		void begin(void);
+		void loop(void);
+
+};
 
 
-
+#endif /* NZS_H_ */

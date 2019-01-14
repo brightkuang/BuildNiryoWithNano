@@ -1,7 +1,5 @@
-/**********************************************************************
- *      Author: tstern
- *
-	Copyright (C) 2018  MisfitTech,  All rights reserved.
+/*
+ * 	Copyright (C) 2018  MisfitTech,  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,26 +18,14 @@
     Misfit Tech invests time and resources providing this open source code,
     please support MisfitTech and open-source hardware by purchasing
 	products from MisfitTech, www.misifittech.net!
- *********************************************************************/
+ */
+#ifndef __STEPPIN_H___
+#define __STEPPIN_H___
+#include "board.h"
 
-#include "utils.h"
-#include "syslog.h"
+void stepPinSetup(void); //setup step pin
 
-double CubicInterpolate(
-   double y0,double y1,
-   double y2,double y3,
-   double mu)
-{
-   double a0,a1,a2,a3,mu2;
-
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
-
-   return(a0*mu*mu2+a1*mu2+a2*mu+a3);
-}
+int64_t getSteps(void); //returns the number of steps changed since last call
 
 
-
+#endif // __STEPPIN_H___

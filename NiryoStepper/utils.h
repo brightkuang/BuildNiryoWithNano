@@ -1,11 +1,11 @@
-/*
-    utils.h
-    Copyright (C) 2017 Niryo
+/**********************************************************************
+ *      Author: tstern
+ *
+	Copyright (C) 2018  MisfitTech,  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+    the Free Software Foundation, either version 3 of the License.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,17 +13,27 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-#ifndef UTILS_H
-#define UTILS_H
+    Written by Trampas Stern for MisfitTech.
 
-#include "config.h"
+    Misfit Tech invests time and resources providing this open source code,
+    please support MisfitTech and open-source hardware by purchasing
+	products from MisfitTech, www.misifittech.net!
+ *********************************************************************/
 
-void init_analog_fast_read();
+/* this file contains generic utilities and functions */
 
-void setup_fan();
+#ifndef UTILS_H_
+#define UTILS_H_
 
 
-#endif
+double CubicInterpolate(
+   double y0,double y1,
+   double y2,double y3,
+   double mu);
+
+
+
+
+#endif /* UTILS_H_ */

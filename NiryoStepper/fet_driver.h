@@ -1,4 +1,9 @@
-/**********************************************************************
+/*
+ * fet_driver.h
+ *
+ *  Created on: Dec 24, 2016
+ *      Author: tstern
+ *
 	Copyright (C) 2018  MisfitTech,  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -14,23 +19,33 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
     Written by Trampas Stern for MisfitTech.
+
+    Misfit Tech invests time and resources providing this open source code,
+    please support MisfitTech and open-source hardware by purchasing
+	products from MisfitTech, www.misifittech.net!
  *********************************************************************/
-#ifndef __A4954__H__
-#define __A4954__H__
+
+#ifndef FET_DRIVER_H_
+#define FET_DRIVER_H_
+
+
+
 #include <Arduino.h>
 #include "board.h"
 #include "angle.h"
 #include "sine.h"
 
-#define A4954_NUM_MICROSTEPS (256)
-#define A4954_MIN_TIME_BETWEEN_STEPS_MICROS  (1000)
+#ifdef NEMA_23_10A_HW
+#define FET_DRIVER_NUM_MICROSTEPS (SINE_STEPS/4) //number of steps to use for microstepping, default is 256
+#define FET_DRIVER_NUM_ZERO_AVG (100)
 
-//prevent someone for making a mistake with the code
-#if ((A4954_NUM_MICROSTEPS*4) != SINE_STEPS)
+
+#define FET_ADC_TO_MA(x) (((x)*2537)/1000)
+#define FET_MA_TO_ADC(x) (((x)*1000)/2537)
+//prvent someone for making a mistake with the code
+#if ((FET_DRIVER_NUM_MICROSTEPS*4) != SINE_STEPS)
 #error "SINE_STEPS must be 4x of Micro steps for the move function"
 #endif
-
-
 
 /*
  *  When it comes to the stepper driver if we use angles
@@ -45,14 +60,42 @@
  *
  */
 
-class A4954
+class FetDriver
 {
+	static FetDriver *ptrInstance;
 private:
 	uint32_t lastStepMicros; // time in microseconds that last step happened
+
+	int32_t PWM_Table_B[512];
+	int32_t PWM_Table_A[512];
+
 	bool forwardRotation=true;
 	volatile bool enabled=true;
 
+	volatile int32_t adc;
+
+
+	volatile int32_t coilB_value=0;
+	volatile int32_t coilB_Zero=-1;
+	volatile int32_t coilB_SetPoint=100;
+	volatile int32_t coilB_error=0;
+
+	volatile int32_t coilA_value=0;
+	volatile int32_t coilA_Zero=-1;
+	volatile int32_t coilA_SetPoint=200;
+	volatile int32_t coilA_error=0;
+	void ctrl_update(uint16_t channel, uint16_t value);
+	void measureCoilB_zero(void);
+	void measureCoilA_zero(void);
+	void CalTableB(int32_t maxMA);
+	void CalTableA(int32_t maxMA);
+	int coilA_PWM(int32_t value);
+	void coilB_PWM(int32_t value);
+	int32_t getCoilB_mA(void);
+	int32_t getCoilA_mA(void);
 public:
+
+	static void ADC_Callback(uint16_t channel, uint16_t value);
 	void begin(void);
 
 	//moves motor where the modulo of A4954_NUM_MICROSTEPS is a full step.
@@ -61,10 +104,10 @@ public:
 	uint32_t microsSinceStep(void) {return micros()-lastStepMicros;};
 	void setRotationDirection(bool forward) {forwardRotation=forward;};
 
-	void enable(bool enable);
-	void limitCurrent(uint8_t percent); //higher more current
+	void enable(bool enable) {enabled=enable;};
+	void limitCurrent(uint8_t x) {return;};
 };
 
 
-
-#endif //__A4954__H__
+#endif //#ifdef NEMA_23_10A_HW
+#endif /* FET_DRIVER_H_ */

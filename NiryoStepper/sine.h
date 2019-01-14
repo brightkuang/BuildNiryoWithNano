@@ -1,4 +1,7 @@
 /**********************************************************************
+ * sine.h
+ *
+ *  Created on: Dec 24, 2016
  *      Author: tstern
  *
 	Copyright (C) 2018  MisfitTech,  All rights reserved.
@@ -22,24 +25,19 @@
 	products from MisfitTech, www.misifittech.net!
  *********************************************************************/
 
-#include "utils.h"
-#include "syslog.h"
 
-double CubicInterpolate(
-   double y0,double y1,
-   double y2,double y3,
-   double mu)
-{
-   double a0,a1,a2,a3,mu2;
+#ifndef SINE_H_
+#define SINE_H_
 
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
+#include "board.h"
 
-   return(a0*mu*mu2+a1*mu2+a2*mu+a3);
-}
+#define SINE_STEPS (1024L)
+
+#define SINE_MAX ((int32_t)(32768L))
 
 
+int16_t sine(uint16_t angle);
+int16_t cosine(uint16_t angle);
 
+
+#endif /* SINE_H_ */
