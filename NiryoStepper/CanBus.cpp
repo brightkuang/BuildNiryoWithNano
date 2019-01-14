@@ -175,7 +175,7 @@ void CanBus::read()
           }
 
           int32_t absolute_steps_at_offset_position = (rxBuf[4] << 8) + rxBuf[5];
-          long current_steps = (sensor_position * stepper_controller->getMicroSteps() * STEPPER_CPR) / AS5047D_CPR;
+          long current_steps = (sensor_position * stepper_controller->getMicroSteps() * STEPPER_CPR) / AS5600_CPR;
           int steps_half_rotation = stepper_controller->getMicroSteps() * STEPPER_CPR / 2;
 
           if (absolute_steps_at_offset_position < steps_half_rotation) {
@@ -218,7 +218,7 @@ void CanBus::read()
           long timeout = rxBuf[7];
           
           uint8_t result = stepper_controller->calibrate(direction, delay_steps, data_position_offset, timeout);
-          long absolute_sensor_steps = (sensor_position * stepper_controller->getMicroSteps() * STEPPER_CPR) / AS5047D_CPR;
+          long absolute_sensor_steps = (sensor_position * stepper_controller->getMicroSteps() * STEPPER_CPR) / AS5600_CPR;
 
           SerialUSB.print("Absolute sensor steps : ");
           SerialUSB.println(absolute_sensor_steps);

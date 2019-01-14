@@ -21,7 +21,7 @@
 
 #include "config.h"
 #include "A4954.h"
-#include "AS5047D.h"
+#include "AS5600.h"
 
 
 class StepperController {

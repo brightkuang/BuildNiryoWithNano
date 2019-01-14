@@ -17,7 +17,6 @@
 */
 
 #include <Arduino.h>
-#define Serial SerialUSB
 
 /*
  * 
@@ -47,9 +46,10 @@
 #include "config.h"
 #include "utils.h"
 #include "A4954.h"
-#include "AS5047D.h"
+#include "AS5600.h"
 #include "StepperController.h"
 #include "CanBus.h"
+#include "board.h"
 
 uint8_t motor_id = MOTOR_ID;
 
@@ -121,7 +121,7 @@ void setup() {
   //speed_up_position_sensor_response_time();
 
   // set register to read once
-  AS5047D_setup();
+  init_position_sensor();
 
   // setup pins for motor driver
   init_driver();

@@ -32,6 +32,20 @@
  * All constants for Niryo One are defined below
  */
 
+
+/*
+ *    ----------- AS5600 Position sensor -------------
+ */
+
+#define AS5600_CPR 4096
+#define AS5600_CPR_HALF 2048
+
+#define AS5600_ADDRESS 0x36
+
+#define AS5600_REG_CONF    0x07
+#define AS5600_REG_ANGLE_H 0x0E
+#define AS5600_REG_ANGLE_L 0x0F
+
 /*
  *    ----------- A4954 Driver -------------
  */
@@ -39,10 +53,10 @@
 #define KEEP_RESISTANCE_WHEN_DETACHED 1
 
 //Defines for pins:
-#define IN_1  8
-#define IN_2  7
-#define IN_3  5
-#define IN_4  6
+#define IN_1  15
+#define IN_2  17
+#define IN_3  3
+#define IN_4  8
 
 #define VREF_1 9
 #define VREF_2 4
@@ -88,7 +102,7 @@
 #define UMAX_PID     UMAX_50_PERCENT
 
 #define spr 200   
-#define aps 360.0/ spr       // angle per step (1.8)
+#define aps 360.0/ spr       // angle per step
 
 /*
  *    ----------- CAN bus -------------
