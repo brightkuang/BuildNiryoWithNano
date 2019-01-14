@@ -1,11 +1,11 @@
-/**********************************************************************
- *      Author: tstern
- *
-	Copyright (C) 2018  MisfitTech,  All rights reserved.
+/*
+    utils.cpp
+    Copyright (C) 2017 Niryo
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License.
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -13,33 +13,31 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-    Written by Trampas Stern for MisfitTech.
-
-    Misfit Tech invests time and resources providing this open source code,
-    please support MisfitTech and open-source hardware by purchasing
-	products from MisfitTech, www.misifittech.net!
- *********************************************************************/
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
 
 #include "utils.h"
-#include "syslog.h"
 
-double CubicInterpolate(
-   double y0,double y1,
-   double y2,double y3,
-   double mu)
+#include <Arduino.h>
+
+// analogRead takes < 30 micros instead of > 400 micros (10 bits precision)
+void init_analog_fast_read()
 {
-   double a0,a1,a2,a3,mu2;
+  ADC->CTRLA.bit.ENABLE = 0;                     // Disable ADC
+  while( ADC->STATUS.bit.SYNCBUSY == 1 );        // Wait for synchronization
+  ADC->CTRLB.reg = ADC_CTRLB_PRESCALER_DIV128 |  // Divide Clock by 128
+                   ADC_CTRLB_RESSEL_10BIT; 
+  ADC->AVGCTRL.reg = ADC_AVGCTRL_SAMPLENUM_1 |   // 1 sample 
+                     ADC_AVGCTRL_ADJRES(0x00ul); // Adjusting result by 0
+  ADC->SAMPCTRL.reg = 0x00;                      // Sampling Time Length = 0
 
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
-
-   return(a0*mu*mu2+a1*mu2+a2*mu+a3);
+  ADC->CTRLA.bit.ENABLE = 1;                     // Enable ADC
+  while( ADC->STATUS.bit.SYNCBUSY == 1 );        // Wait for synchronization
 }
 
-
+void setup_fan()
+{
+  pinMode(FAN_PIN, OUTPUT);
+  delay(10);
+}
 

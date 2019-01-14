@@ -1,5 +1,5 @@
 /*
-    utils.h
+    analogFastWrite.h
     Copyright (C) 2017 Niryo
 
     This program is free software: you can redistribute it and/or modify
@@ -14,16 +14,38 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+    This file was originally licensed under Creative Commons 
+    Attribution Share-Alike 4.0 License
+    Copyright (C) Mechaduino-firmware
 */
 
-#ifndef UTILS_H
-#define UTILS_H
+//187kHz PWM implementation.  Stock analogWrite is much slower and is very audible!
 
-#include "config.h"
+#pragma once
 
-void init_analog_fast_read();
+#include <stdint.h>
 
-void setup_fan();
-
-
+#ifdef __cplusplus
+extern "C" {
 #endif
+
+/*
+ * \brief SAMD products have only one reference for ADC
+ */
+
+
+extern void analogFastWrite( uint32_t ulPin, uint32_t ulValue ) ;
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+
+
+
+
+
+
