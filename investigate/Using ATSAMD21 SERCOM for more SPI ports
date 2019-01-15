@@ -93,17 +93,22 @@ void loop() {
   mySPI.endTransaction();
 }
 
-IN_1		15  PB08
-IN_2		17  PA04
-IN_3		3   PA09
-IN_4		8   PA06
+IN_1		15  PB08      PIN_A4954_IN1  A4  (18)
+IN_2		17  PA04      PIN_A4954_IN2  D7  (7)
+IN_3		3   PA09      PIN_A4954_IN3  D5  (5)
+IN_4		8   PA06      PIN_A4954_IN4  D6  (6)
 
-VREF_1		9
-VREF_2		4
+VREF_1		9           PIN_A4954_VREF12  D9  (9)
+VREF_2		4           PIN_A4954_VREF34  D4  (4)
 
-ledPin		    PA21
+ledPin		    PA21    PIN_YELLOW_LED  TXLED (26)
 
-CAN_PIN_CS   	16  PB09
-CAN_PIN_INT	38  PA13
+CAN_PIN_CS  16  PB09  PIN_STEP_INPUT  D0  (0)
 
-FAN_PIN        	6   PA20
+CAN_PIN_MOSI          PIN_DIR_INPUT   D1  (1)
+CAN_PIN_MISO                          D3  (3)
+
+CAN_PIN_INT 38  PA13  RXD             D31 (31£©
+
+FAN_PIN  	6   PA20    PIN_RED_LED     D13 (13)
+
