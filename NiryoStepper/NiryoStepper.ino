@@ -46,7 +46,7 @@
 #include "config.h"
 #include "utils.h"
 #include "A4954.h"
-#include "AS5600.h"
+#include "AS5047D.h"
 #include "StepperController.h"
 #include "CanBus.h"
 
@@ -104,10 +104,21 @@ void setup() {
   Serial.println("-------------- START --------------");
   canBus.setup();
   
-  Wire.begin();
-  Wire.setClock(1000000); // 1 Mbits
-  delay(100);
-
+  digitalWrite(PIN_AS5047D_CS,LOW); //pull CS LOW by default (chip powered off)
+  digitalWrite(PIN_MOSI,LOW);
+  digitalWrite(PIN_SCK,LOW);
+  digitalWrite(PIN_MISO,LOW);
+  pinMode(PIN_MISO,INPUT);
+  pinMode(PIN_AS5047D_CS,OUTPUT);
+  delay(1000);
+    
+  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high by default
+  delay(1);
+  SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
+  Serial.println("Begin AS5047D...");
+  
+  SPI.beginTransaction(5000000, MSBFIRST, SPI_MODE1);    //400000, MSBFIRST, SPI_MODE1);
+  
   // start fan
   setup_fan();
   fan_HIGH();

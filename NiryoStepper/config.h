@@ -34,17 +34,23 @@
 
 
 /*
- *    ----------- AS5600 Position sensor -------------
+ *    ----------- AS5047D Position sensor -------------
  */
 
-#define AS5600_CPR 4096
-#define AS5600_CPR_HALF 2048
+#define AS5047D_CPR 4096
+#define AS5047D_CPR_HALF 2048
 
-#define AS5600_ADDRESS 0x36
+#define AS5047D_ADDRESS 0x36
 
-#define AS5600_REG_CONF    0x07
-#define AS5600_REG_ANGLE_H 0x0E
-#define AS5600_REG_ANGLE_L 0x0F
+#define AS5047D_REG_CONF    0x07
+#define AS5047D_REG_ANGLE_H 0x0E
+#define AS5047D_REG_ANGLE_L 0x0F
+
+#define PIN_MOSI        (23)
+#define PIN_SCK         (24)
+#define PIN_MISO        (22)
+
+#define PIN_AS5047D_CS  (16)  //analogInputToDigitalPin(PIN_A2))
 
 /*
  *    ----------- A4954 Driver -------------

@@ -125,7 +125,7 @@ void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, cons
     Serial.print(c);
     Serial.print(", D : ");
     Serial.print(d);
-    Serial.println(". <- values to check if SPI ok");*/
+    Serial.println(". <- values to check if SPI2 ok");*/
 }
 
 /*********************************************************************************************************
@@ -492,15 +492,7 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canIDMode, const INT8U canSpeed, const I
 {
 
   INT8U res;
-
-    // do this first, for Reasons
-    SPI2.begin();
-
-    // Assign pins 0, 1, 3 to ERCOM & SERCOM_ALT functionality
-    pinPeripheral(0, PIO_SERCOM_ALT);
-    pinPeripheral(1, PIO_SERCOM_ALT);
-    pinPeripheral(3, PIO_SERCOM_ALT);
-    
+  
     mcp2515_reset();
     
     mcpMode = MCP_LOOPBACK;
@@ -769,7 +761,14 @@ INT8U MCP_CAN::begin(INT8U idmodeset, INT8U speedset, INT8U clockset)
 {
     INT8U res;
 
+    // do this first, for Reasons
     SPI2.begin();
+
+    // Assign pins 0, 1, 3 to ERCOM & SERCOM_ALT functionality
+    pinPeripheral(0, PIO_SERCOM_ALT);
+    pinPeripheral(1, PIO_SERCOM_ALT);
+    pinPeripheral(3, PIO_SERCOM_ALT);
+
     SPI2.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // TODO : needed ?
     res = mcp2515_init(idmodeset, speedset, clockset);
     if (res == MCP2515_OK)
