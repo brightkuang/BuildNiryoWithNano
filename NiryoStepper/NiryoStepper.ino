@@ -179,7 +179,7 @@ void loop() {
   if (action_available) {
     if(canBus.available()) 
     {
-      canBus.read();
+      canBus.read(as5047d);
       action_available = false;
     }
   }

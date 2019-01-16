@@ -240,9 +240,8 @@ void StepperController::standardModeUpdate()
  * If an offset has been set, a successful answer will be sent
  * 
  */
-uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout) // timeout in seconds
+uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout, AS5047D &as5047d) // timeout in seconds
 {
-  as5047d = new AS5047D();
   
   Serial.println("Start calibration");
   Serial.print("Direction : ");

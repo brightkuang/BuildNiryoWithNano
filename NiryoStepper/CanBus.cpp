@@ -103,7 +103,7 @@ bool CanBus::available()
  * - get command (first data byte)
  * - execute command action with the rest of data
  */
-void CanBus::read()
+void CanBus::read(AS5047D &as5047d)
 {   
     can_driver->readMsgBuf(&rxId, &len, rxBuf);     // read data (len 8) : 291 micros, (len : 1) : 224 micros  
                                                           
@@ -217,7 +217,7 @@ void CanBus::read()
           int direction = rxBuf[6];
           long timeout = rxBuf[7];
           
-          uint8_t result = stepper_controller->calibrate(direction, delay_steps, data_position_offset, timeout);
+          uint8_t result = stepper_controller->calibrate(direction, delay_steps, data_position_offset, timeout, as5047d);
           long absolute_sensor_steps = (sensor_position * stepper_controller->getMicroSteps() * STEPPER_CPR) / AS5047D_CPR;
 
           Serial.print("Absolute sensor steps : ");

@@ -57,7 +57,7 @@ void speed_up_position_sensor_response_time()
 /*
  * Read sensor position register
  */
-int read_encoder()
+int AS5047D::read_encoder()
 {
   int angle;
   

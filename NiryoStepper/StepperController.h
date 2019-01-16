@@ -59,7 +59,7 @@ class StepperController {
     void start();
     void stop();
 
-    uint8_t calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout);
+    uint8_t calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout, AS5047D &as5047d);
 
     void setMicroSteps(uint8_t micro_steps);
     void setMaxEffort(uint8_t effort);
