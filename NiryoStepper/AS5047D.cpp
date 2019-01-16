@@ -17,6 +17,7 @@
 */
 
 #include "AS5047D.h"
+#include "SPI.h"
 
 volatile long sensor_position = 0;
 volatile long last_sensor_position = 0;
@@ -27,31 +28,137 @@ volatile long motor_position_without_offset = 0;
 volatile long motor_position_steps = 0;
 volatile long offset = 0;
 
+#define AS5047D_CMD_NOP   (0x0000)
+#define AS5047D_CMD_ERRFL (0x0001)
+#define AS5047D_CMD_PROG  (0x0003)
+#define AS5047D_CMD_DIAAGC (0x3FFC)
+#define AS5047D_CMD_MAG    (0x3FFD)
+#define AS5047D_CMD_ANGLEUNC (0x3FFE)
+#define AS5047D_CMD_ANGLECOM (0x3FFF)
+
+static int getBit(int16_t data, int bit)
+{
+  return (data>>bit) & 0x01;
+}
+
+static int getParity(uint16_t data)
+{
+  int i,bits;
+  data=data & 0x7FFF; //mask out upper bit
+
+  //count number of bits, brute force
+  bits=0;
+  for(i=0; i<16; i++)
+  {
+    if (0 != (data & ((0x0001)<<i)))
+    {
+      bits++;
+    }
+  }
+  return (bits & 0x01); //return 1 if odd
+}
+
 /*
  * Ask for position register
  */
 boolean AS5047D::init_position_sensor()
 {
-  Wire.beginTransmission(AS5047D_ADDRESS); 
-  Wire.write(AS5047D_REG_ANGLE_H);
-  Wire.endTransmission();
-  delay(50);
+  digitalWrite(PIN_AS5047D_CS,LOW); //pull CS LOW by default (chip powered off)
+  digitalWrite(PIN_MOSI,LOW);
+  digitalWrite(PIN_SCK,LOW);
+  digitalWrite(PIN_MISO,LOW);
+  pinMode(PIN_MISO,OUTPUT);
+  delay(1000);
+
+  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high
+  pinMode(PIN_MISO,INPUT);
+
+  error=false;
+  SPISettings settingsA(5000000, MSBFIRST, SPI_MODE1);             ///400000, MSBFIRST, SPI_MODE1);
+
+  pinMode(PIN_AS5047D_CS,OUTPUT);
+  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high by default
+  delay(1);
+
+  SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
+  Serial.println("Begin AS5047D...");
+
+  SPI.beginTransaction(settingsA);
+  SPI.transfer16(0x0000);
+  delay(10);
+
+  //wait for the LF bit to be set
+  uint16_t data=0,t0=2000;
+  while (getBit(data,8)==0)
+  {
+    delay(1);
+    t0--;
+    if (t0==0)
+    {
+      Serial.println("LF bit not set");
+      error=true;
+      return false;
+    }
+    Serial.print("data is ");
+    Serial.println(data);
+    data=readAddress(AS5047D_CMD_DIAAGC);
+  }
+  return true;
 }
 
-/*
- * Will make sensor give a more recent value (from 2200 micros to 290 micros)
- * --> also means more noise
- * --> it is better not to activate it for normal Niryo One usage
- * 
- * !!! you need to call this before init_position_sensor !!!
- */
-void speed_up_position_sensor_response_time()
+//read the encoders 
+int16_t AS5047D::readAddress(uint16_t addr)
 {
-  Wire.beginTransmission(AS5047D_ADDRESS);
-  Wire.write(AS5047D_REG_CONF); 
-  Wire.write(0x1F); // WD : 0, FTH : 111, SF : 11 : 0x1f
-  Wire.endTransmission();
-  delay(50);
+  uint16_t data;
+  error=false;
+  //make sure it is a read by setting bit 14
+  addr=addr | 0x4000;
+
+  //add the parity to the command
+  if (1 == getParity(addr))
+  {
+    addr=(addr & 0x7FFF) | 0x8000; //add parity bit to make command even number of bits
+  }
+
+  digitalWrite(PIN_AS5047D_CS, LOW);
+  delayMicroseconds(1);
+  //clock out the address to read
+  SPI.transfer16(addr);
+  digitalWrite(PIN_AS5047D_CS, HIGH);
+  delayMicroseconds(1);
+  digitalWrite(PIN_AS5047D_CS, LOW);
+  //clock out zeros to read in the data from address
+  data=SPI.transfer16(0x00);
+
+  digitalWrite(PIN_AS5047D_CS, HIGH);
+
+  if (data & (1<<14))
+  {
+    //if bit 14 is set then we have an error
+    Serial.print("read command failed: ");
+    Serial.println(addr);
+    error=true;
+    return -1;
+  }
+
+  if (data>>15 != getParity(data))
+  {
+    //parity did not match
+    Serial.print("read command parity error: ");
+    Serial.println(addr);
+    error=true;
+    return -2;
+  }
+
+  data=data & 0x3FFF; //mask off the error and parity bits
+
+  return data;
+}
+
+//read the encoders 
+int16_t AS5047D::readEncoderAngle(void)
+{
+  return readAddress(AS5047D_CMD_ANGLECOM);
 }
 
 /*

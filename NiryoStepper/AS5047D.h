@@ -34,9 +34,12 @@ extern volatile long motor_position_steps;
 extern volatile long offset;
 
 class AS5047D {
+  private:
+    int16_t readAddress(uint16_t addr);
+    bool error=false;
   public:
     boolean init_position_sensor();
-    void speed_up_position_sensor_response_time();
+    int16_t readEncoderAngle(void);
     int read_encoder();
 
     boolean update_current_position(int microsteps);
