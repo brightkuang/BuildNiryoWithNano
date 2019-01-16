@@ -27,7 +27,6 @@ CanBus::CanBus(MCP_CAN* mcp, StepperController* sc, uint8_t motor_id)
 
 void CanBus::setup()
 {
-
   // Initialize MCP2515 running at 16MHz with a baudrate of 1000kb/s
   if(can_driver->begin(MCP_STDEXT, CAN_1000KBPS, MCP_16MHZ) == CAN_OK) {
     Serial.println("MCP2515 Initialized Successfully!");
@@ -47,7 +46,6 @@ void CanBus::setup()
 
   can_driver->setMode(MCP_NORMAL);
   Serial.println("MCP2515 CAN started");
-
 }
 
 /*

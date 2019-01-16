@@ -17,6 +17,7 @@
 */
 
 #include <Arduino.h>
+#define SerialUSB Serial
 
 /*
  * 
@@ -78,17 +79,17 @@ unsigned long write_frequency_firmware_version = 5000000; // 0.2 Hz
 // This is called every 0.5 seconds
 void debug_serial()
 {
-  //Serial.print("Sensor position : ");
-  //Serial.println(sensor_position);
+  //SerialUSB.print("Sensor position : ");
+  //SerialUSB.println(sensor_position);
 
-  /*Serial.print("Motor position : ");
-  Serial.print(motor_position_steps);
-  //Serial.print(", current steps : ");
-  //Serial.print(stepper.getCurrentStepNumber());
-  Serial.print(", goal steps : ");
-  Serial.println(stepper.getGoalStepNumber());
-  Serial.print("Sensor position : ");
-  Serial.println(sensor_position);
+  /*SerialUSB.print("Motor position : ");
+  SerialUSB.print(motor_position_steps);
+  //SerialUSB.print(", current steps : ");
+  //SerialUSB.print(stepper.getCurrentStepNumber());
+  SerialUSB.print(", goal steps : ");
+  SerialUSB.println(stepper.getGoalStepNumber());
+  SerialUSB.print("Sensor position : ");
+  SerialUSB.println(sensor_position);
   */
 }
 
@@ -99,26 +100,16 @@ long time_begin_debug_serial = micros();
 //////////////////////////////////////
 
 void setup() {
-  Serial.begin(115200);  
+
+  SerialUSB.begin(115200);  
   delay(2000);
-  Serial.println("-------------- START --------------");
+  SerialUSB.println("-------------- START --------------");
   canBus.setup();
   
-  digitalWrite(PIN_AS5047D_CS,LOW); //pull CS LOW by default (chip powered off)
-  digitalWrite(PIN_MOSI,LOW);
-  digitalWrite(PIN_SCK,LOW);
-  digitalWrite(PIN_MISO,LOW);
-  pinMode(PIN_MISO,INPUT);
-  pinMode(PIN_AS5047D_CS,OUTPUT);
-  delay(1000);
-    
-  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high by default
-  delay(1);
-  SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
-  Serial.println("Begin AS5047D...");
-  
-  SPI.beginTransaction(5000000, MSBFIRST, SPI_MODE1);    //400000, MSBFIRST, SPI_MODE1);
-  
+  Wire.begin();
+  Wire.setClock(1000000); // 1 Mbits
+  delay(100);
+
   // start fan
   setup_fan();
   fan_HIGH();
@@ -143,7 +134,7 @@ void setup() {
   stepper.start();
   stepper.setControlMode(STEPPER_CONTROL_MODE_RELAX);
   
-  Serial.println("-------------- SETUP FINISHED --------------");
+  SerialUSB.println("-------------- SETUP FINISHED --------------");
 }
 
 //////////////////////////////////////
