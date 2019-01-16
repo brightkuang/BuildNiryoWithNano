@@ -1,0 +1,43 @@
+nano:
+
+readAddress(AS5047D_CMD_ANGLECOM); 0x3FFF
+
+Angle StepperCtrl::sampleAngle(void)
+  angle=((uint32_t)encoder.readEncoderAngle())<<2; //convert the 14 bit encoder value to a 16 bit number
+
+Angle StepperCtrl::getEncoderAngle(void)
+  a=calTable.fastReverseLookup(sampleAngle());
+
+int64_t StepperCtrl::getCurrentLocation(void)
+{
+   Angle a;
+   int32_t x;
+   bool state=TC5_ISR_Enabled;
+   disableTCInterrupts();
+   a=calTable.fastReverseLookup(sampleAngle());
+   x=(int32_t)a - (int32_t)((currentLocation) & ANGLE_MAX);
+
+   if (x>((int32_t)ANGLE_STEPS/2))
+   {
+      currentLocation -= ANGLE_STEPS;
+   }
+   if (x<-((int32_t)ANGLE_STEPS/2))
+   {
+      currentLocation += ANGLE_STEPS;
+   }
+   currentLocation=(currentLocation & 0xFFFFFFFFFFFF0000UL) | (uint16_t)a;
+   if (state) enableTCInterrupts();
+   return currentLocation;
+
+}
+
+#define CALIBRATION_STEPS ((uint32_t)ANGLE_STEPS) // this is one rotation ie 0-65535 aka 65536 steps is 0-360 degrees 
+
+	x=(36000*(int32_t)error)/ANGLE_STEPS /100 ; (0x010000UL)
+
+niryo:
+
+
+
+
+
