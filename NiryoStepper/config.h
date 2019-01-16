@@ -46,6 +46,12 @@
 #define AS5047D_REG_ANGLE_H 0x0E
 #define AS5047D_REG_ANGLE_L 0x0F
 
+#define PIN_AS5047D_CS  (16)//analogInputToDigitalPin(PIN_A2))
+
+#define PIN_MOSI        (23)
+#define PIN_SCK         (24)
+#define PIN_MISO        (22)
+
 /*
  *    ----------- A4954 Driver -------------
  */

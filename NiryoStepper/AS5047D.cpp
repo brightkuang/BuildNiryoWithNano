@@ -30,7 +30,7 @@ volatile long offset = 0;
 /*
  * Ask for position register
  */
-void init_position_sensor()
+boolean AS5047D::init_position_sensor()
 {
   Wire.beginTransmission(AS5047D_ADDRESS); 
   Wire.write(AS5047D_REG_ANGLE_H);
@@ -70,7 +70,7 @@ int read_encoder()
   return angle;  
 }
 
-void update_current_position(int microsteps) 
+boolean AS5047D::update_current_position(int microsteps) 
 {
   // read from encoder
   sensor_position = read_encoder();

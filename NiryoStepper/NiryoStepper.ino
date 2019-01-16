@@ -17,7 +17,6 @@
 */
 
 #include <Arduino.h>
-#define SerialUSB Serial
 
 /*
  * 
@@ -56,6 +55,9 @@ uint8_t motor_id = MOTOR_ID;
 // Stepper controller
 StepperController stepper;
 
+// Position Sensor
+AS5047D as5047d;
+
 // Can driver
 MCP_CAN can_driver(CAN_PIN_CS);
 
@@ -79,17 +81,17 @@ unsigned long write_frequency_firmware_version = 5000000; // 0.2 Hz
 // This is called every 0.5 seconds
 void debug_serial()
 {
-  //SerialUSB.print("Sensor position : ");
-  //SerialUSB.println(sensor_position);
+  //Serial.print("Sensor position : ");
+  //Serial.println(sensor_position);
 
-  /*SerialUSB.print("Motor position : ");
-  SerialUSB.print(motor_position_steps);
-  //SerialUSB.print(", current steps : ");
-  //SerialUSB.print(stepper.getCurrentStepNumber());
-  SerialUSB.print(", goal steps : ");
-  SerialUSB.println(stepper.getGoalStepNumber());
-  SerialUSB.print("Sensor position : ");
-  SerialUSB.println(sensor_position);
+  /*Serial.print("Motor position : ");
+  Serial.print(motor_position_steps);
+  //Serial.print(", current steps : ");
+  //Serial.print(stepper.getCurrentStepNumber());
+  Serial.print(", goal steps : ");
+  Serial.println(stepper.getGoalStepNumber());
+  Serial.print("Sensor position : ");
+  Serial.println(sensor_position);
   */
 }
 
@@ -101,15 +103,34 @@ long time_begin_debug_serial = micros();
 
 void setup() {
 
-  SerialUSB.begin(115200);  
+  Serial.begin(115200);  
   delay(2000);
-  SerialUSB.println("-------------- START --------------");
+  Serial.println("-------------- START --------------");
   canBus.setup();
   
-  Wire.begin();
-  Wire.setClock(1000000); // 1 Mbits
-  delay(100);
+  digitalWrite(PIN_AS5047D_CS,LOW); //pull CS LOW by default (chip powered off)
+  digitalWrite(PIN_MOSI,LOW);
+  digitalWrite(PIN_SCK,LOW);
+  digitalWrite(PIN_MISO,LOW);
+  pinMode(PIN_MISO,OUTPUT);
+  delay(1000);
 
+  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high
+  pinMode(PIN_MISO,INPUT);
+
+  SPISettings settingsA(5000000, MSBFIRST, SPI_MODE1);             ///400000, MSBFIRST, SPI_MODE1);
+
+  pinMode(PIN_AS5047D_CS,OUTPUT);
+  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high by default
+  delay(1);
+
+  SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
+  Serial.println("Begin AS5047D...");
+
+  SPI.beginTransaction(settingsA);
+  SPI.transfer16(0x0000);
+  delay(10);
+    
   // start fan
   setup_fan();
   fan_HIGH();
@@ -122,7 +143,7 @@ void setup() {
   //speed_up_position_sensor_response_time();
 
   // set register to read once
-  init_position_sensor();
+  as5047d.init_position_sensor();
 
   // setup pins for motor driver
   init_driver();
@@ -134,7 +155,7 @@ void setup() {
   stepper.start();
   stepper.setControlMode(STEPPER_CONTROL_MODE_RELAX);
   
-  SerialUSB.println("-------------- SETUP FINISHED --------------");
+  Serial.println("-------------- SETUP FINISHED --------------");
 }
 
 //////////////////////////////////////
@@ -149,7 +170,7 @@ void loop() {
   action_available = true;
 
   // read position from sensor
-  update_current_position(stepper.getMicroSteps());
+  as5047d.update_current_position(stepper.getMicroSteps());
 
   // update stepper controller
   stepper.update();

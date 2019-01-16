@@ -22,7 +22,7 @@
 #include "config.h"
 #include "A4954.h"
 #include "AS5047D.h"
-
+extern AS5047D as5047D;
 
 class StepperController {
 

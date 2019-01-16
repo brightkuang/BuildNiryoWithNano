@@ -242,6 +242,8 @@ void StepperController::standardModeUpdate()
  */
 uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout) // timeout in seconds
 {
+  as5047d = new AS5047D();
+  
   Serial.println("Start calibration");
   Serial.print("Direction : ");
   Serial.println(direction);
@@ -274,7 +276,7 @@ uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, l
     position = (direction) ? position + 1 : position - 1; // increment position
     output(-1800 * position / 32, UMAX_50_PERCENT); // 32 microsteps -> more precision
     delayMicroseconds(delay_steps);
-    update_current_position(micro_steps); // read pos from sensor
+    as5047d.update_current_position(micro_steps); // read pos from sensor
     
     // Check if motor missed a step
     if (direction && (motor_position_steps - last_motor_position_steps < 0)) {
@@ -303,7 +305,7 @@ uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, l
     position = (direction) ? position + 1 : position - 1;
     output(-1800 * position / 32, UMAX_40_PERCENT); // 32 microsteps -> more precision
     delayMicroseconds(10000); // go slower
-    update_current_position(micro_steps); // read pos from sensor
+    as5047d.update_current_position(micro_steps); // read pos from sensor
   }
   
   delay(500);
