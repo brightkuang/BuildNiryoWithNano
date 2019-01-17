@@ -81,17 +81,17 @@ unsigned long write_frequency_firmware_version = 5000000; // 0.2 Hz
 // This is called every 0.5 seconds
 void debug_serial()
 {
-  //Serial.print("Sensor position : ");
-  //Serial.println(sensor_position);
+  //SerialUSB.print("Sensor position : ");
+  //SerialUSB.println(sensor_position);
 
-  /*Serial.print("Motor position : ");
-  Serial.print(motor_position_steps);
-  //Serial.print(", current steps : ");
-  //Serial.print(stepper.getCurrentStepNumber());
-  Serial.print(", goal steps : ");
-  Serial.println(stepper.getGoalStepNumber());
-  Serial.print("Sensor position : ");
-  Serial.println(sensor_position);
+  /*SerialUSB.print("Motor position : ");
+  SerialUSB.print(motor_position_steps);
+  //SerialUSB.print(", current steps : ");
+  //SerialUSB.print(stepper.getCurrentStepNumber());
+  SerialUSB.print(", goal steps : ");
+  SerialUSB.println(stepper.getGoalStepNumber());
+  SerialUSB.print("Sensor position : ");
+  SerialUSB.println(sensor_position);
   */
 }
 
@@ -103,9 +103,9 @@ long time_begin_debug_serial = micros();
 
 void setup() {
 
-  Serial.begin(115200);  
+  SerialUSB.begin(115200);  
   delay(2000);
-  Serial.println("-------------- START --------------");
+  SerialUSB.println("-------------- START --------------");
   canBus.setup();
      
   // start fan
@@ -131,8 +131,8 @@ void setup() {
   
   stepper.start();
   stepper.setControlMode(STEPPER_CONTROL_MODE_RELAX);
-  
-  Serial.println("-------------- SETUP FINISHED --------------");
+
+  SerialUSB.println("-------------- SETUP FINISHED --------------");
 }
 
 //////////////////////////////////////

@@ -29,10 +29,10 @@ void CanBus::setup()
 {
   // Initialize MCP2515 running at 16MHz with a baudrate of 1000kb/s
   if(can_driver->begin(MCP_STDEXT, CAN_1000KBPS, MCP_16MHZ) == CAN_OK) {
-    Serial.println("MCP2515 Initialized Successfully!");
+    SerialUSB.println("MCP2515 Initialized Successfully!");
   }
   else {
-    Serial.println("Error Initializing MCP2515...");
+    SerialUSB.println("Error Initializing MCP2515...");
   } 
 
   // Set interrupt pin as input
@@ -45,7 +45,7 @@ void CanBus::setup()
   can_driver->init_Filt(2,0,CAN_BROADCAST_ID * 65536);
 
   can_driver->setMode(MCP_NORMAL);
-  Serial.println("MCP2515 CAN started");
+  SerialUSB.println("MCP2515 CAN started");
 }
 
 /*
@@ -109,13 +109,13 @@ void CanBus::read(AS5047D &as5047d)
                                                           
     // check id is standard, not extended
     if ((rxId & 0x80000000) == 0x80000000) {
-      Serial.println("Extended ID, nop nop nop.");
+      SerialUSB.println("Extended ID, nop nop nop.");
       return;
     }
 
     // check message is not a remote request frame
     if((rxId & 0x40000000) == 0x40000000){            
-      Serial.print("Remote request frame");
+      SerialUSB.print("Remote request frame");
       return;
     } 
 
@@ -158,10 +158,10 @@ void CanBus::read(AS5047D &as5047d)
 
           stepper_controller->relativeMove(steps, delay);
 
-          Serial.print("Relative Move, steps : ");
-          Serial.print(steps);
-          Serial.print(", delay : ");
-          Serial.println(delay);
+          SerialUSB.print("Relative Move, steps : ");
+          SerialUSB.print(steps);
+          SerialUSB.print(", delay : ");
+          SerialUSB.println(delay);
       }
       break;
       case CAN_CMD_OFFSET:
@@ -197,10 +197,10 @@ void CanBus::read(AS5047D &as5047d)
 
           offset = data_position_offset;
 
-          Serial.print("Set offset : ");
-          Serial.println(offset);
-          Serial.print("New motor rotation count : ");
-          Serial.println(motor_rotation_count);
+          SerialUSB.print("Set offset : ");
+          SerialUSB.println(offset);
+          SerialUSB.print("New motor rotation count : ");
+          SerialUSB.println(motor_rotation_count);
         }
       break;
       case CAN_CMD_CALIBRATE:
@@ -220,8 +220,8 @@ void CanBus::read(AS5047D &as5047d)
           uint8_t result = stepper_controller->calibrate(direction, delay_steps, data_position_offset, timeout, as5047d);
           long absolute_sensor_steps = (sensor_position * stepper_controller->getMicroSteps() * STEPPER_CPR) / AS5047D_CPR;
 
-          Serial.print("Absolute sensor steps : ");
-          Serial.println(absolute_sensor_steps);
+          SerialUSB.print("Absolute sensor steps : ");
+          SerialUSB.println(absolute_sensor_steps);
           writeCalibrationResult(result, (int)absolute_sensor_steps);
         }
       break;
@@ -230,7 +230,7 @@ void CanBus::read(AS5047D &as5047d)
           if (len < 2) { break; } // pb
           
           bool begin_traj = rxBuf[1];
-          Serial.println("Synchronize");
+          SerialUSB.println("Synchronize");
           stepper_controller->synchronizePosition(begin_traj);
         }
       break;
@@ -240,14 +240,14 @@ void CanBus::read(AS5047D &as5047d)
                  
           uint8_t control_mode = rxBuf[1];
           stepper_controller->setControlMode(control_mode);
-          Serial.print("Set Mode : ");
-          Serial.println(control_mode);
-          Serial.print("Current step : ");
-          Serial.println(stepper_controller->getCurrentStepNumber());
-          Serial.print("Goal step : ");
-          Serial.println(stepper_controller->getGoalStepNumber());
-          Serial.print("Motor position : ");
-          Serial.println(motor_position_steps);
+          SerialUSB.print("Set Mode : ");
+          SerialUSB.println(control_mode);
+          SerialUSB.print("Current step : ");
+          SerialUSB.println(stepper_controller->getCurrentStepNumber());
+          SerialUSB.print("Goal step : ");
+          SerialUSB.println(stepper_controller->getGoalStepNumber());
+          SerialUSB.print("Motor position : ");
+          SerialUSB.println(motor_position_steps);
 
         }
       break;
@@ -257,8 +257,8 @@ void CanBus::read(AS5047D &as5047d)
           
           uint8_t micro_steps = rxBuf[1];
           stepper_controller->setMicroSteps(micro_steps);
-          Serial.print("Set Stepper Micro Steps : ");
-          Serial.println(micro_steps);
+          SerialUSB.print("Set Stepper Micro Steps : ");
+          SerialUSB.println(micro_steps);
         }
       break;
       case CAN_CMD_MAX_EFFORT: // value between 0 and 255
@@ -267,8 +267,8 @@ void CanBus::read(AS5047D &as5047d)
 
           uint8_t umax = rxBuf[1];
           stepper_controller->setMaxEffort(umax);
-          Serial.print("Set max effort : ");
-          Serial.println(umax);
+          SerialUSB.print("Set max effort : ");
+          SerialUSB.println(umax);
         }
       break;
       default:

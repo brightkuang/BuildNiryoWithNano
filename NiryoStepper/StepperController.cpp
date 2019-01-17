@@ -153,18 +153,18 @@ void StepperController::setNewGoal(long steps)
   }
   
   /*if (step_diff != 0) {
-    Serial.print("steps received : ");
-    Serial.print(steps);
-    Serial.print(", current_step : ");
-    Serial.print(current_step_number);
-    Serial.print(", step diff : ");
-    Serial.print(step_diff);
-    Serial.print(", steps_to_add_to_goal : ");
-    Serial.print(steps_to_add_to_goal);
-    //Serial.print(", delay : ");
-    //Serial.print(delay_between_two_updates);
-    Serial.print(", current sensor steps : ");
-    Serial.println(motor_position_steps);
+    SerialUSB.print("steps received : ");
+    SerialUSB.print(steps);
+    SerialUSB.print(", current_step : ");
+    SerialUSB.print(current_step_number);
+    SerialUSB.print(", step diff : ");
+    SerialUSB.print(step_diff);
+    SerialUSB.print(", steps_to_add_to_goal : ");
+    SerialUSB.print(steps_to_add_to_goal);
+    //SerialUSB.print(", delay : ");
+    //SerialUSB.print(delay_between_two_updates);
+    SerialUSB.print(", current sensor steps : ");
+    SerialUSB.println(motor_position_steps);
   }*/
 }
 
@@ -243,9 +243,9 @@ void StepperController::standardModeUpdate()
 uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout, AS5047D &as5047d) // timeout in seconds
 {
   
-  Serial.println("Start calibration");
-  Serial.print("Direction : ");
-  Serial.println(direction);
+  SerialUSB.println("Start calibration");
+  SerialUSB.print("Direction : ");
+  SerialUSB.println(direction);
 
   int MISS_STEPS_TRESHOLD = 4;
   long time_begin_calibration = micros();
@@ -313,20 +313,20 @@ uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, l
   detach();
 
   if (calibration_ok) {
-    Serial.println("---- END -->");
-    Serial.print("Home position : ");
-    Serial.print(home_position);
-    Serial.print(", Motor position : ");
-    Serial.println(motor_position_without_offset);
+    SerialUSB.println("---- END -->");
+    SerialUSB.print("Home position : ");
+    SerialUSB.print(home_position);
+    SerialUSB.print(", Motor position : ");
+    SerialUSB.println(motor_position_without_offset);
     offset = motor_position_without_offset - steps_offset; 
     current_step_number = motor_position_steps;
     goal_step_number = motor_position_steps;
-    Serial.print("Calibration OK, set offset : ");
-    Serial.println(offset);
+    SerialUSB.print("Calibration OK, set offset : ");
+    SerialUSB.println(offset);
     return STEPPER_CALIBRATION_OK;
   }
   else {
-    Serial.println("Calibration timeout");
+    SerialUSB.println("Calibration timeout");
     return STEPPER_CALIBRATION_TIMEOUT;
   }
 }

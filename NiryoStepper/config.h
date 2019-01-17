@@ -53,25 +53,25 @@
 #define KEEP_RESISTANCE_WHEN_DETACHED 1
 
 //Defines for pins:
-#define IN_1  15
-#define IN_2  17
-#define IN_3  3
-#define IN_4  8
+#define IN_1  18  //A4
+#define IN_2  7   //D7
+#define IN_3  5   //D5
+#define IN_4  6   //D6
 
-#define VREF_1 9
-#define VREF_2 4
+#define VREF_1 9  //D9
+#define VREF_2 4  //D4
 
 //for faster digitalWrite:
-#define IN_1_HIGH() (REG_PORT_OUTSET1 = PORT_PB08)
-#define IN_1_LOW() (REG_PORT_OUTCLR1 = PORT_PB08)
-#define IN_2_HIGH() (REG_PORT_OUTSET0 = PORT_PA04)
-#define IN_2_LOW() (REG_PORT_OUTCLR0 = PORT_PA04)
-#define IN_3_HIGH() (REG_PORT_OUTSET0 = PORT_PA09)
-#define IN_3_LOW() (REG_PORT_OUTCLR0 = PORT_PA09)
-#define IN_4_HIGH() (REG_PORT_OUTSET0 = PORT_PA06)
-#define IN_4_LOW() (REG_PORT_OUTCLR0 = PORT_PA06)
-#define ledPin_HIGH() (REG_PORT_OUTSET0 = PORT_PA21)
-#define ledPin_LOW() (REG_PORT_OUTCLR0 = PORT_PA21)
+#define IN_1_HIGH() (REG_PORT_OUTSET1 = PORT_PA05)
+#define IN_1_LOW() (REG_PORT_OUTCLR1 = PORT_PA05)
+#define IN_2_HIGH() (REG_PORT_OUTSET0 = PORT_PA21)
+#define IN_2_LOW() (REG_PORT_OUTCLR0 = PORT_PA21)
+#define IN_3_HIGH() (REG_PORT_OUTSET0 = PORT_PA15)
+#define IN_3_LOW() (REG_PORT_OUTCLR0 = PORT_PA15)
+#define IN_4_HIGH() (REG_PORT_OUTSET0 = PORT_PA20)
+#define IN_4_LOW() (REG_PORT_OUTCLR0 = PORT_PA20)
+#define ledPin_HIGH() (REG_PORT_OUTSET0 = PORT_PA17)
+#define ledPin_LOW() (REG_PORT_OUTCLR0 = PORT_PA17)
 
 #define iMAX 2.0
 #define rSense 0.150
@@ -153,7 +153,7 @@
  *    ----------- Driver temperature sensor -------------
  */
 
-#define TEMPERATURE_SENSOR_PIN A4 
+#define TEMPERATURE_SENSOR_PIN A5
 
 
 /*
@@ -165,3 +165,13 @@
 #define fan_LOW() (REG_PORT_OUTCLR0 = PORT_PA20)
 
 #endif
+
+
+//mechaduio and Arduino Zero has defined serial ports differently than NZS
+#ifdef MECHADUINO_HARDWARE
+#warning "Compiling source for Mechaduino NOT NZS"
+#define DISABLE_LCD
+#define Serial5 Serial 
+#else
+#define SerialUSB Serial
+#endif 
