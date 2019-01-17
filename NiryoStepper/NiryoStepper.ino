@@ -107,30 +107,7 @@ void setup() {
   delay(2000);
   Serial.println("-------------- START --------------");
   canBus.setup();
-  
-  digitalWrite(PIN_AS5047D_CS,LOW); //pull CS LOW by default (chip powered off)
-  digitalWrite(PIN_MOSI,LOW);
-  digitalWrite(PIN_SCK,LOW);
-  digitalWrite(PIN_MISO,LOW);
-  pinMode(PIN_MISO,OUTPUT);
-  delay(1000);
-
-  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high
-  pinMode(PIN_MISO,INPUT);
-
-  SPISettings settingsA(5000000, MSBFIRST, SPI_MODE1);             ///400000, MSBFIRST, SPI_MODE1);
-
-  pinMode(PIN_AS5047D_CS,OUTPUT);
-  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high by default
-  delay(1);
-
-  SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
-  Serial.println("Begin AS5047D...");
-
-  SPI.beginTransaction(settingsA);
-  SPI.transfer16(0x0000);
-  delay(10);
-    
+     
   // start fan
   setup_fan();
   fan_HIGH();
