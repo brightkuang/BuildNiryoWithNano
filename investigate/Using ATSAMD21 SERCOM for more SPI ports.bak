@@ -46,11 +46,11 @@ PA03  *42*     AREF
 
 
 VIN
-Step   D0            SERCOM0.3  SERCOM2.3        SCK   PA11 (0)
-Dir    D1            SERCOM0.2  SERCOM2.2        MOSI  PA10 (1)
-Error  D10           SERCOM1.2  SERCOM3.2        CS    PA18 (10)
+Step   D0            SERCOM0.3  SERCOM2.3        SCK   PA11 (36)
+Dir    D1            SERCOM0.2  SERCOM2.2        MOSI  PA10 (35)
+Error  D10           SERCOM1.2  SERCOM3.2
 GND
-D3     D3            SERCOM0.1  SERCOM2.1        MISO  PA09 (3)
+D3     D3            SERCOM0.1  SERCOM2.1        MISO  PA09 (34)
 V3.3
 TXD    D30                      SERCOM5.2  TXD
 RXD    D31                      SERCOM5.3  RXD

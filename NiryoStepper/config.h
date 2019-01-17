@@ -34,17 +34,11 @@
 
 
 /*
- *    ----------- AS5600 Position sensor -------------
+ *    ----------- AS5047D Position sensor -------------
  */
 
 #define AS5047D_CPR 4096
 #define AS5047D_CPR_HALF 2048
-
-#define AS5047D_ADDRESS 0x36
-
-#define AS5047D_REG_CONF    0x07
-#define AS5047D_REG_ANGLE_H 0x0E
-#define AS5047D_REG_ANGLE_L 0x0F
 
 #define PIN_AS5047D_CS  (16)//analogInputToDigitalPin(PIN_A2))
 
@@ -133,8 +127,8 @@
 #define CAN_DATA_FIRMWARE_VERSION 0x10
 
 // see https://github.com/arduino/ArduinoCore-samd/blob/master/variants/arduino_zero/variant.cpp
-#define CAN_PIN_CS  16  // PB09 
-#define CAN_PIN_INT 38  // PA13 
+#define CAN_PIN_CS  10  // PB18 
+#define CAN_PIN_INT 15  // PB08 
 
 
 /*
@@ -166,7 +160,7 @@
  *    ----------- Fan -------------
  */
 
-#define FAN_PIN 6 // PA20
+#define FAN_PIN 14 // PA02
 #define fan_HIGH() (REG_PORT_OUTSET0 = PORT_PA20)
 #define fan_LOW() (REG_PORT_OUTCLR0 = PORT_PA20)
 

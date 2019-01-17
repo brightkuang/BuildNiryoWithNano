@@ -168,12 +168,8 @@ int AS5047D::read_encoder()
 {
   int angle;
   
-  Wire.requestFrom(AS5047D_ADDRESS, 2);
-    
-  uint8_t msb = Wire.read();
-  uint8_t lsb = Wire.read();
-  angle = ((msb & 0b00001111) << 8) + lsb;
-
+  angle=((uint32_t)readEncoderAngle())<<2; //convert the 14 bit encoder value to a 16 bit number
+ 
   return angle;  
 }
 
