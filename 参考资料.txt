@@ -1,0 +1,51 @@
+Niryo One
+https://niryo.com/
+https://github.com/NiryoRobotics/niryo_one_ros
+
+Raspbian
+https://www.raspberrypi.org/downloads/raspbian/
+
+flash tools: 
+https://www.balena.io/etcher/
+
+ROS kinetic
+http://wiki.ros.org/kinetic
+
+install Wiring Pi: 
+http://wiringpi.com/download-and-install/
+
+Arduino 1-wire Sniffer
+https://www.instructables.com/id/Arduino-1-wire-sniffer/
+
+4 different Methods of 1-wire access on Raspberry Pi
+http://blog.gegg.us/2013/03/4-different-methods-of-1-wire-access-on-raspberry-pi/
+
+How to Drive Dynamixel AX-12A Servos (with a RaspberryPi)
+https://www.instructables.com/id/How-to-drive-Dynamixel-AX-12A-servos-with-a-Raspbe/
+
+Test Dynamixel servos
+https://www.roboticstomorrow.com/article/2014/03/beta-testing-dynamixel-xl-320-servos/248
+
+Using ATSAMD21 SERCOM for more SPI, I2C and Serial ports
+https://learn.adafruit.com/using-atsamd21-sercom-to-add-more-spi-i2c-serial-ports/overview
+
+Dynamixel
+http://emanual.robotis.com/docs/en/dxl/x/xl320/
+http://emanual.robotis.com/docs/en/dxl/x/xl430-w250/
+
+Misfittech
+http://misfittech.net/blog/installing-the-nano-zero-stepper/
+
+SAMD21G
+https://www.microchip.com/wwwproducts/en/ATSAMD21G18
+
+MCP2515
+https://www.microchip.com/wwwproducts/en/en010406
+
+Saleae Logic
+https://www.saleae.com/zh/
+
+3D printer
+https://3ddistributed.com/corexy-3d-printer/
+https://www.repetier.com/
+
