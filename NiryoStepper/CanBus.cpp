@@ -28,7 +28,7 @@ CanBus::CanBus(MCP_CAN* mcp, StepperController* sc, uint8_t motor_id)
 void CanBus::setup()
 {
   // Initialize MCP2515 running at 16MHz with a baudrate of 1000kb/s
-  if(can_driver->begin(MCP_STDEXT, CAN_1000KBPS, MCP_16MHZ) == CAN_OK) {
+  if(can_driver->begin(MCP_STDEXT, CAN_1000KBPS, MCP_8MHZ) == CAN_OK) {
     SerialUSB.println("MCP2515 Initialized Successfully!");
   }
   else {
@@ -103,7 +103,7 @@ bool CanBus::available()
  * - get command (first data byte)
  * - execute command action with the rest of data
  */
-void CanBus::read(AS5047D &as5047d)
+void CanBus::read()
 {   
     can_driver->readMsgBuf(&rxId, &len, rxBuf);     // read data (len 8) : 291 micros, (len : 1) : 224 micros  
                                                           
@@ -217,7 +217,7 @@ void CanBus::read(AS5047D &as5047d)
           int direction = rxBuf[6];
           long timeout = rxBuf[7];
           
-          uint8_t result = stepper_controller->calibrate(direction, delay_steps, data_position_offset, timeout, as5047d);
+          uint8_t result = stepper_controller->calibrate(direction, delay_steps, data_position_offset, timeout);
           long absolute_sensor_steps = (sensor_position * stepper_controller->getMicroSteps() * STEPPER_CPR) / AS5047D_CPR;
 
           SerialUSB.print("Absolute sensor steps : ");

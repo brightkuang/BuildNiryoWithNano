@@ -67,8 +67,7 @@ void StepperController::synchronizePosition(bool begin_trajectory)
 void StepperController::attach() 
 {
   steps_to_add_to_goal = 0;
-  fan_HIGH();
-  output(- 1800 * current_step_number / micro_steps, umax);
+  output(-1800 * current_step_number / micro_steps, umax);
 }
 
 void StepperController::detach()
@@ -79,7 +78,6 @@ void StepperController::detach()
   else {
     output(-1800 * current_step_number / micro_steps, 0);
   }
-  fan_LOW();
 }
 
 void StepperController::start() 
@@ -151,21 +149,7 @@ void StepperController::setNewGoal(long steps)
   else {
     delay_between_two_updates = 10000;
   }
-  
-  /*if (step_diff != 0) {
-    SerialUSB.print("steps received : ");
-    SerialUSB.print(steps);
-    SerialUSB.print(", current_step : ");
-    SerialUSB.print(current_step_number);
-    SerialUSB.print(", step diff : ");
-    SerialUSB.print(step_diff);
-    SerialUSB.print(", steps_to_add_to_goal : ");
-    SerialUSB.print(steps_to_add_to_goal);
-    //SerialUSB.print(", delay : ");
-    //SerialUSB.print(delay_between_two_updates);
-    SerialUSB.print(", current sensor steps : ");
-    SerialUSB.println(motor_position_steps);
-  }*/
+
 }
 
 /*
@@ -214,7 +198,6 @@ void StepperController::standardModeUpdate()
   if (micros() - time_last_step < 180) { 
     return;
   }
-  
   if (current_step_number < goal_step_number) {
     ++current_step_number;
     output(-1800 * current_step_number / micro_steps, umax);
@@ -240,13 +223,8 @@ void StepperController::standardModeUpdate()
  * If an offset has been set, a successful answer will be sent
  * 
  */
-uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout, AS5047D &as5047d) // timeout in seconds
+uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, long steps_offset, unsigned long calibration_timeout) // timeout in seconds
 {
-  
-  SerialUSB.println("Start calibration");
-  SerialUSB.print("Direction : ");
-  SerialUSB.println(direction);
-
   int MISS_STEPS_TRESHOLD = 4;
   long time_begin_calibration = micros();
   long timeout = 1000000 * (calibration_timeout - 3); // take 3 sec off calibration timeout
@@ -269,13 +247,13 @@ uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, l
     output(-1800 * position / 32, UMAX_40_PERCENT); // 32 microsteps -> more precision
     delayMicroseconds(i);
   }
-
+  int kb = 1;
   // move at constant speed until reach an obstacle
   while (micros() - time_begin_calibration < timeout) {
     position = (direction) ? position + 1 : position - 1; // increment position
     output(-1800 * position / 32, UMAX_50_PERCENT); // 32 microsteps -> more precision
     delayMicroseconds(delay_steps);
-    as5047d.update_current_position(micro_steps); // read pos from sensor
+    update_current_position(micro_steps); // read pos from sensor
     
     // Check if motor missed a step
     if (direction && (motor_position_steps - last_motor_position_steps < 0)) {
@@ -287,14 +265,15 @@ uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, l
     else {
       miss_steps_counter = 0;
     }
-    
-    if (miss_steps_counter > MISS_STEPS_TRESHOLD) {
+         
+    if (miss_steps_counter > MISS_STEPS_TRESHOLD or kb > 10) {
       calibration_ok = true;
       break;
     }
+    kb++;
     last_motor_position_steps = motor_position_steps;
   }
-
+  
   // Now we are close
   // Continue to rotate (slowly) to get home position and set offset 
   long home_position = motor_position_without_offset;
@@ -304,7 +283,7 @@ uint8_t StepperController::calibrate(int direction, unsigned long delay_steps, l
     position = (direction) ? position + 1 : position - 1;
     output(-1800 * position / 32, UMAX_40_PERCENT); // 32 microsteps -> more precision
     delayMicroseconds(10000); // go slower
-    as5047d.update_current_position(micro_steps); // read pos from sensor
+    update_current_position(micro_steps); // read pos from sensor
   }
   
   delay(500);

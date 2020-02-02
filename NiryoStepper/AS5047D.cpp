@@ -17,7 +17,15 @@
 */
 
 #include "AS5047D.h"
-#include "SPI.h"
+#include <SPI.h>
+
+#define AS5047D_CMD_NOP   (0x0000)
+#define AS5047D_CMD_ERRFL (0x0001)
+#define AS5047D_CMD_PROG  (0x0003)
+#define AS5047D_CMD_DIAAGC (0x3FFC)
+#define AS5047D_CMD_MAG    (0x3FFD)
+#define AS5047D_CMD_ANGLEUNC (0x3FFE)
+#define AS5047D_CMD_ANGLECOM (0x3FFF)
 
 volatile long sensor_position = 0;
 volatile long last_sensor_position = 0;
@@ -28,13 +36,7 @@ volatile long motor_position_without_offset = 0;
 volatile long motor_position_steps = 0;
 volatile long offset = 0;
 
-#define AS5047D_CMD_NOP   (0x0000)
-#define AS5047D_CMD_ERRFL (0x0001)
-#define AS5047D_CMD_PROG  (0x0003)
-#define AS5047D_CMD_DIAAGC (0x3FFC)
-#define AS5047D_CMD_MAG    (0x3FFD)
-#define AS5047D_CMD_ANGLEUNC (0x3FFE)
-#define AS5047D_CMD_ANGLECOM (0x3FFF)
+int chipSelectPin;
 
 static int getBit(int16_t data, int bit)
 {
@@ -61,8 +63,19 @@ static int getParity(uint16_t data)
 /*
  * Ask for position register
  */
-boolean AS5047D::init_position_sensor()
+void init_position_sensor()
 {
+	pinMode(PIN_AS5047D_CS,OUTPUT);
+  digitalWrite(PIN_AS5047D_CS,LOW);
+  pinMode(PIN_AS5047D_PWR,OUTPUT);
+  digitalWrite(PIN_AS5047D_PWR,HIGH);
+  pinMode(PIN_MOSI,OUTPUT);
+  digitalWrite(PIN_MOSI,LOW);
+  pinMode(PIN_SCK,OUTPUT);
+  digitalWrite(PIN_SCK,LOW);
+  pinMode(PIN_MISO,INPUT);
+  
+	digitalWrite(PIN_AS5047D_PWR,HIGH);
   digitalWrite(PIN_AS5047D_CS,LOW); //pull CS LOW by default (chip powered off)
   digitalWrite(PIN_MOSI,LOW);
   digitalWrite(PIN_SCK,LOW);
@@ -71,20 +84,23 @@ boolean AS5047D::init_position_sensor()
   delay(1000);
 
   digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high
+  digitalWrite(PIN_AS5047D_PWR,LOW);
+
   pinMode(PIN_MISO,INPUT);
 
-  error=false;
   SPISettings settingsA(5000000, MSBFIRST, SPI_MODE1);             ///400000, MSBFIRST, SPI_MODE1);
+  chipSelectPin=PIN_AS5047D_CS;
 
-  pinMode(PIN_AS5047D_CS,OUTPUT);
-  digitalWrite(PIN_AS5047D_CS,HIGH); //pull CS high by default
+  SerialUSB.print("chipSelectPin is ");
+  SerialUSB.println(chipSelectPin);
+  pinMode(chipSelectPin,OUTPUT);
+  digitalWrite(chipSelectPin,HIGH); //pull CS high by default
   delay(1);
-
   SPI.begin();    //AS5047D SPI uses mode=1 (CPOL=0, CPHA=1)
-  Serial.println("Begin AS5047D...");
+  SerialUSB.println("Begin AS5047D...");
 
   SPI.beginTransaction(settingsA);
-  SPI.transfer16(0x0000);
+  SPI.transfer16(AS5047D_CMD_NOP);
   delay(10);
 
   //wait for the LF bit to be set
@@ -95,22 +111,19 @@ boolean AS5047D::init_position_sensor()
     t0--;
     if (t0==0)
     {
-      Serial.println("LF bit not set");
-      error=true;
-      return false;
+      SerialUSB.println("LF bit not set");
     }
-    Serial.print("data is ");
-    Serial.println(data);
+    SerialUSB.print("AS5047D_CMD_DIAAGC:");
+    SerialUSB.println(data);
     data=readAddress(AS5047D_CMD_DIAAGC);
   }
-  return true;
 }
 
 //read the encoders 
-int16_t AS5047D::readAddress(uint16_t addr)
+int16_t readAddress(uint16_t addr)
 {
   uint16_t data;
-  error=false;
+  
   //make sure it is a read by setting bit 14
   addr=addr | 0x4000;
 
@@ -120,33 +133,31 @@ int16_t AS5047D::readAddress(uint16_t addr)
     addr=(addr & 0x7FFF) | 0x8000; //add parity bit to make command even number of bits
   }
 
-  digitalWrite(PIN_AS5047D_CS, LOW);
+  digitalWrite(chipSelectPin, LOW);
   delayMicroseconds(1);
   //clock out the address to read
   SPI.transfer16(addr);
-  digitalWrite(PIN_AS5047D_CS, HIGH);
+  digitalWrite(chipSelectPin, HIGH);
   delayMicroseconds(1);
-  digitalWrite(PIN_AS5047D_CS, LOW);
+  digitalWrite(chipSelectPin, LOW);
   //clock out zeros to read in the data from address
   data=SPI.transfer16(0x00);
 
-  digitalWrite(PIN_AS5047D_CS, HIGH);
+  digitalWrite(chipSelectPin, HIGH);
 
   if (data & (1<<14))
   {
     //if bit 14 is set then we have an error
-    Serial.print("read command failed: ");
-    Serial.println(addr);
-    error=true;
+    SerialUSB.print("read command failed"); 
+    SerialUSB.println(addr); 
     return -1;
   }
 
   if (data>>15 != getParity(data))
   {
     //parity did not match
-    Serial.print("read command parity error: ");
-    Serial.println(addr);
-    error=true;
+    SerialUSB.print("read command parity error 0x%04X ");
+    SerialUSB.println(addr);
     return -2;
   }
 
@@ -155,28 +166,22 @@ int16_t AS5047D::readAddress(uint16_t addr)
   return data;
 }
 
-//read the encoders 
-int16_t AS5047D::readEncoderAngle(void)
-{
-  return readAddress(AS5047D_CMD_ANGLECOM);
-}
-
 /*
  * Read sensor position register
  */
-int AS5047D::read_encoder()
+int read_encoder()
 {
   int angle;
   
-  angle=((uint32_t)readEncoderAngle())<<2; //convert the 14 bit encoder value to a 16 bit number
- 
+  angle=((uint32_t)readAddress(AS5047D_CMD_ANGLEUNC)) >> 3;
+
   return angle;  
 }
 
-boolean AS5047D::update_current_position(int microsteps) 
+void update_current_position(int microsteps) 
 {
   // read from encoder
-  sensor_position = read_encoder();
+  sensor_position = read_encoder() * 2;
 
   // check if motor did one rotation
   if (sensor_position - last_sensor_position < - AS5047D_CPR_HALF) {

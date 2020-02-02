@@ -21,7 +21,6 @@
 #ifndef _MCP2515_H_
 #define _MCP2515_H_
 
-#include "config.h"
 #include "mcp_can_dfs.h"
 #define MAX_CHAR_IN_MESSAGE 8
 

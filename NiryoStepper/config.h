@@ -16,9 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NIRYO_CONFIG_H
-#define NIRYO_CONFIG_H
-
+#define SerialUSB Serial
 
 /*
  * Firmware version : 0.1.0
@@ -32,19 +30,19 @@
  * All constants for Niryo One are defined below
  */
 
-
 /*
  *    ----------- AS5047D Position sensor -------------
  */
 
+#define PIN_AS5047D_CS   (16)//analogInputToDigitalPin(PIN_A2))
+#define PIN_AS5047D_PWR  (11) //pull low to power on AS5047D
+
+#define PIN_MOSI         (23)
+#define PIN_SCK          (24)
+#define PIN_MISO         (22)
+
 #define AS5047D_CPR 4096
 #define AS5047D_CPR_HALF 2048
-
-#define PIN_AS5047D_CS  (16)//analogInputToDigitalPin(PIN_A2))
-
-#define PIN_MOSI        (23)
-#define PIN_SCK         (24)
-#define PIN_MISO        (22)
 
 /*
  *    ----------- A4954 Driver -------------
@@ -53,25 +51,29 @@
 #define KEEP_RESISTANCE_WHEN_DETACHED 1
 
 //Defines for pins:
-#define IN_1  18  //A4
-#define IN_2  7   //D7
-#define IN_3  5   //D5
-#define IN_4  6   //D6
+#define IN_1  18
+#define IN_2  7
+#define IN_3  6
+#define IN_4  5
 
-#define VREF_1 9  //D9
-#define VREF_2 4  //D4
+#define VREF_1 9
+#define VREF_2 4
 
 //for faster digitalWrite:
 #define IN_1_HIGH() (REG_PORT_OUTSET1 = PORT_PA05)
 #define IN_1_LOW() (REG_PORT_OUTCLR1 = PORT_PA05)
 #define IN_2_HIGH() (REG_PORT_OUTSET0 = PORT_PA21)
 #define IN_2_LOW() (REG_PORT_OUTCLR0 = PORT_PA21)
-#define IN_3_HIGH() (REG_PORT_OUTSET0 = PORT_PA15)
-#define IN_3_LOW() (REG_PORT_OUTCLR0 = PORT_PA15)
-#define IN_4_HIGH() (REG_PORT_OUTSET0 = PORT_PA20)
-#define IN_4_LOW() (REG_PORT_OUTCLR0 = PORT_PA20)
-#define ledPin_HIGH() (REG_PORT_OUTSET0 = PORT_PA17)
-#define ledPin_LOW() (REG_PORT_OUTCLR0 = PORT_PA17)
+#define IN_3_HIGH() (REG_PORT_OUTSET0 = PORT_PA20)
+#define IN_3_LOW() (REG_PORT_OUTCLR0 = PORT_PA20)
+#define IN_4_HIGH() (REG_PORT_OUTSET0 = PORT_PA15)
+#define IN_4_LOW() (REG_PORT_OUTCLR0 = PORT_PA15)
+#define ledPin_HIGH() (REG_PORT_OUTSET0 = PORT_PA06)
+#define ledPin_LOW() (REG_PORT_OUTCLR0 = PORT_PA06)
+
+#define GPIO_LOW(pin) {PORT->Group[g_APinDescription[(pin)].ulPort].OUTCLR.reg = (1ul << g_APinDescription[(pin)].ulPin);}
+#define GPIO_HIGH(pin) {PORT->Group[g_APinDescription[(pin)].ulPort].OUTSET.reg = (1ul << g_APinDescription[(pin)].ulPin);}
+#define GPIO_OUTPUT(pin) {PORT->Group[g_APinDescription[(pin)].ulPort].PINCFG[g_APinDescription[(pin)].ulPin].reg &=~(uint8_t)(PORT_PINCFG_INEN) ;  PORT->Group[g_APinDescription[(pin)].ulPort].DIRSET.reg = (uint32_t)(1<<g_APinDescription[(pin)].ulPin) ;}
 
 #define iMAX 2.0
 #define rSense 0.150
@@ -98,7 +100,7 @@
 #define UMAX_10_PERCENT  (int)(0.10 * uMAX) // 23
 #define UMAX_05_PERCENT  (int)(0.05 * uMAX) // 11
 
-#define UMAX_DEFAULT UMAX_25_PERCENT
+#define UMAX_DEFAULT UMAX_05_PERCENT
 #define UMAX_PID     UMAX_50_PERCENT
 
 #define spr 200   
@@ -127,8 +129,8 @@
 #define CAN_DATA_FIRMWARE_VERSION 0x10
 
 // see https://github.com/arduino/ArduinoCore-samd/blob/master/variants/arduino_zero/variant.cpp
-#define CAN_PIN_CS  10  // PB18 
-#define CAN_PIN_INT 15  // PB08 
+#define CAN_PIN_CS  3  // PA09 
+#define CAN_PIN_INT 1  // PA10 
 
 
 /*
@@ -148,30 +150,3 @@
 #define STEPPER_CALIBRATION_OK        1
 #define STEPPER_CALIBRATION_TIMEOUT   2
 #define STEPPER_CALIBRATION_BAD_PARAM 3
-
-/*
- *    ----------- Driver temperature sensor -------------
- */
-
-#define TEMPERATURE_SENSOR_PIN A5
-
-
-/*
- *    ----------- Fan -------------
- */
-
-#define FAN_PIN 14 // PA02
-#define fan_HIGH() (REG_PORT_OUTSET0 = PORT_PA20)
-#define fan_LOW() (REG_PORT_OUTCLR0 = PORT_PA20)
-
-#endif
-
-
-//mechaduio and Arduino Zero has defined serial ports differently than NZS
-#ifdef MECHADUINO_HARDWARE
-#warning "Compiling source for Mechaduino NOT NZS"
-#define DISABLE_LCD
-#define Serial5 Serial 
-#else
-#define SerialUSB Serial
-#endif 

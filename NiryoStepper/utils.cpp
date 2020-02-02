@@ -34,10 +34,3 @@ void init_analog_fast_read()
   ADC->CTRLA.bit.ENABLE = 1;                     // Enable ADC
   while( ADC->STATUS.bit.SYNCBUSY == 1 );        // Wait for synchronization
 }
-
-void setup_fan()
-{
-  pinMode(FAN_PIN, OUTPUT);
-  delay(10);
-}
-

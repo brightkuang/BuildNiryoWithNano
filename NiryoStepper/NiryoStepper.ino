@@ -32,7 +32,7 @@
  * 
  */
 
-#define MOTOR_ID   1  // <-- change this value for each stepper motor (1-4) on Niryo One
+#define MOTOR_ID   3  // <-- change this value for each stepper motor (1-4) on Niryo One
 
 /*
  * 
@@ -40,7 +40,6 @@
  * 
  */
 
-#include <Wire.h>
 #include <SPI.h>
 
 #include "config.h"
@@ -54,9 +53,6 @@ uint8_t motor_id = MOTOR_ID;
 
 // Stepper controller
 StepperController stepper;
-
-// Position Sensor
-AS5047D as5047d;
 
 // Can driver
 MCP_CAN can_driver(CAN_PIN_CS);
@@ -102,15 +98,11 @@ long time_begin_debug_serial = micros();
 //////////////////////////////////////
 
 void setup() {
-
   SerialUSB.begin(115200);  
-  delay(2000);
+  delay(5000);
   SerialUSB.println("-------------- START --------------");
+  pinMode(CAN_PIN_CS, OUTPUT);
   canBus.setup();
-     
-  // start fan
-  setup_fan();
-  fan_HIGH();
 
   // speed up analogRead() function
   init_analog_fast_read();
@@ -120,7 +112,7 @@ void setup() {
   //speed_up_position_sensor_response_time();
 
   // set register to read once
-  as5047d.init_position_sensor();
+  init_position_sensor();
 
   // setup pins for motor driver
   init_driver();
@@ -131,7 +123,7 @@ void setup() {
   
   stepper.start();
   stepper.setControlMode(STEPPER_CONTROL_MODE_RELAX);
-
+  
   SerialUSB.println("-------------- SETUP FINISHED --------------");
 }
 
@@ -147,7 +139,7 @@ void loop() {
   action_available = true;
 
   // read position from sensor
-  as5047d.update_current_position(stepper.getMicroSteps());
+  update_current_position(stepper.getMicroSteps());
 
   // update stepper controller
   stepper.update();
@@ -156,7 +148,7 @@ void loop() {
   if (action_available) {
     if(canBus.available()) 
     {
-      canBus.read(as5047d);
+      canBus.read();
       action_available = false;
     }
   }
@@ -193,7 +185,7 @@ void loop() {
     if (analog_read_enable) {
       if (micros() - time_last_read_temperature > read_temperature_frequency) {
         time_last_read_temperature += read_temperature_frequency;
-        driver_temperature = analogRead(TEMPERATURE_SENSOR_PIN);
+        driver_temperature = 5;
         action_available = false;
       }
     } 

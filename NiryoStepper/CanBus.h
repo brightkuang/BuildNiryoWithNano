@@ -50,7 +50,7 @@ class CanBus {
       void writeFirmwareVersion(uint8_t major, uint8_t minor, uint8_t patch);
       
       bool available();
-      void read(AS5047D &as5047d);
+      void read();
 };
 
 #endif

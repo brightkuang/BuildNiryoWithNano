@@ -19,12 +19,13 @@
   1301  USA
 */
 #include "mcp_can.h"
-#include "wiring_private.h" // pinPeripheral() function
+#include "wiring_private.h"
+#define SerialUSB Serial
 
-SPIClass SPI2 (&sercom2, 1, 0, 3, SPI_PAD_2_SCK_3, SERCOM_RX_PAD_1);
+SPIClass mySPI (&sercom3, 20, 21, 10, SPI_PAD_0_SCK_1, SERCOM_RX_PAD_2);
 
-#define spi2_readwrite SPI2.transfer
-#define spi2_read() spi2_readwrite(0x00)
+#define spi_readwrite mySPI.transfer
+#define spi_read() spi_readwrite(0x00)
 
 /*********************************************************************************************************
 ** Function name:           mcp2515_reset
@@ -33,7 +34,7 @@ SPIClass SPI2 (&sercom2, 1, 0, 3, SPI_PAD_2_SCK_3, SERCOM_RX_PAD_1);
 void MCP_CAN::mcp2515_reset(void)                                      
 {
     MCP2515_SELECT();
-    spi2_readwrite(MCP_RESET);
+    byte response = spi_readwrite(MCP_RESET);
     MCP2515_UNSELECT();
     delayMicroseconds(10);
 }
@@ -47,9 +48,9 @@ INT8U MCP_CAN::mcp2515_readRegister(const INT8U address)
     INT8U ret;
 
     MCP2515_SELECT();
-    spi2_readwrite(MCP_READ);
-    spi2_readwrite(address);
-    ret = spi2_read();
+    byte e = spi_readwrite(MCP_READ);
+    byte f = spi_readwrite(address);
+    ret = spi_read();
     MCP2515_UNSELECT();
 
     return ret;
@@ -63,11 +64,11 @@ void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const I
 {
     INT8U i;
     MCP2515_SELECT();
-    spi2_readwrite(MCP_READ);
-    spi2_readwrite(address);
+    spi_readwrite(MCP_READ);
+    spi_readwrite(address);
     // mcp2515 has auto-increment of address-pointer
     for (i=0; i<n; i++) 
-        values[i] = spi2_read();
+        values[i] = spi_read();
 
     MCP2515_UNSELECT();
 }
@@ -79,9 +80,9 @@ void MCP_CAN::mcp2515_readRegisterS(const INT8U address, INT8U values[], const I
 void MCP_CAN::mcp2515_setRegister(const INT8U address, const INT8U value)
 {
     MCP2515_SELECT();
-    spi2_readwrite(MCP_WRITE);
-    spi2_readwrite(address);
-    spi2_readwrite(value);
+    spi_readwrite(MCP_WRITE);
+    spi_readwrite(address);
+    spi_readwrite(value);
     MCP2515_UNSELECT();
     //delayMicroseconds(250);
 }
@@ -94,11 +95,11 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
 {
     INT8U i;
     MCP2515_SELECT();
-    spi2_readwrite(MCP_WRITE);
-    spi2_readwrite(address);
+    spi_readwrite(MCP_WRITE);
+    spi_readwrite(address);
        
     for (i=0; i<n; i++) 
-        spi2_readwrite(values[i]);
+        spi_readwrite(values[i]);
   
     MCP2515_UNSELECT();
     //delayMicroseconds(250);
@@ -111,13 +112,13 @@ void MCP_CAN::mcp2515_setRegisterS(const INT8U address, const INT8U values[], co
 void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, const INT8U data)
 {
     MCP2515_SELECT();
-    byte a = spi2_readwrite(MCP_BITMOD);
-    byte b = spi2_readwrite(address);
-    byte c = spi2_readwrite(mask);
-    byte d = spi2_readwrite(data);
+    byte a = spi_readwrite(MCP_BITMOD);
+    byte b = spi_readwrite(address);
+    byte c = spi_readwrite(mask);
+    byte d = spi_readwrite(data);
     MCP2515_UNSELECT();
     //delayMicroseconds(250);
-    /*SerialUSB.print("A : ");
+    /* SerialUSB.print("A : ");
     SerialUSB.print(a);
     SerialUSB.print(", B : ");
     SerialUSB.print(b);
@@ -125,7 +126,7 @@ void MCP_CAN::mcp2515_modifyRegister(const INT8U address, const INT8U mask, cons
     SerialUSB.print(c);
     SerialUSB.print(", D : ");
     SerialUSB.print(d);
-    SerialUSB.println(". <- values to check if SPI ok");*/
+    SerialUSB.println(". <- values to check if SPI ok"); */
 }
 
 /*********************************************************************************************************
@@ -136,8 +137,8 @@ INT8U MCP_CAN::mcp2515_readStatus(void)
 {
     INT8U i;
     MCP2515_SELECT();
-    spi2_readwrite(MCP_READ_STATUS);
-    i = spi2_read();
+    spi_readwrite(MCP_READ_STATUS);
+    i = spi_read();
     MCP2515_UNSELECT();
     return i;
 }
@@ -501,7 +502,7 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canIDMode, const INT8U canSpeed, const I
     if(res > 0)
     {
 #if DEBUG_MODE
-      SerialUSB.print("Entering Configuration Mode Failure...\r\n"); 
+    SerialUSB.print("Entering Configuration Mode Failure...\r\n"); 
 #endif
       return res;
     }
@@ -513,7 +514,7 @@ INT8U MCP_CAN::mcp2515_init(const INT8U canIDMode, const INT8U canSpeed, const I
     if(mcp2515_configRate(canSpeed, canClock))
     {
 #if DEBUG_MODE
-      SerialUSB.print("Setting Baudrate Failure...\r\n");
+    SerialUSB.print("Setting Baudrate Failure...\r\n");
 #endif
       return res;
     }
@@ -761,14 +762,11 @@ INT8U MCP_CAN::begin(INT8U idmodeset, INT8U speedset, INT8U clockset)
 {
     INT8U res;
 
-    SPI2.begin();
-
-    // Assign pins 0, 1, 3 to ERCOM & SERCOM_ALT functionality
-    pinPeripheral(0, PIO_SERCOM_ALT);
-    pinPeripheral(1, PIO_SERCOM_ALT);
-    pinPeripheral(3, PIO_SERCOM_ALT);
-    
-    SPI2.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // TODO : needed ?
+    mySPI.begin();
+    pinPeripheral(20, PIO_SERCOM);
+    pinPeripheral(21, PIO_SERCOM);
+    pinPeripheral(10, PIO_SERCOM_ALT);
+    mySPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // TODO : needed ?
     res = mcp2515_init(idmodeset, speedset, clockset);
     if (res == MCP2515_OK)
         return CAN_OK;

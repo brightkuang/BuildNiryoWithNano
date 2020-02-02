@@ -396,12 +396,12 @@
 #define MCP_RXBUF_0 (MCP_RXB0SIDH)
 #define MCP_RXBUF_1 (MCP_RXB1SIDH)
 
-//#define MCP2515_SELECT()   digitalWrite(MCPCS, LOW)
-//#define MCP2515_UNSELECT() digitalWrite(MCPCS, HIGH)
+#define MCP2515_SELECT()   digitalWrite(MCPCS, LOW)
+#define MCP2515_UNSELECT() digitalWrite(MCPCS, HIGH)
 
 // faster digitalWrite
-#define MCP2515_SELECT()   (REG_PORT_OUTCLR1 = PORT_PB09)
-#define MCP2515_UNSELECT() (REG_PORT_OUTSET1 = PORT_PB09)
+//#define MCP2515_SELECT()   (REG_PORT_OUTCLR1 = PORT_PB09)
+//#define MCP2515_UNSELECT() (REG_PORT_OUTSET1 = PORT_PB09)
 
 #define MCP2515_OK         (0)
 #define MCP2515_FAIL       (1)

@@ -21,7 +21,6 @@
 
 #include "config.h"
 #include <Arduino.h>
-#include <Wire.h>
 
 extern volatile long sensor_position;
 extern volatile long last_sensor_position;
@@ -33,16 +32,10 @@ extern volatile long motor_position_steps;
 
 extern volatile long offset;
 
-class AS5047D {
-  private:
-    int16_t readAddress(uint16_t addr);
-    bool error=false;
-  public:
-    boolean init_position_sensor();
-    int16_t readEncoderAngle(void);
-    int read_encoder();
+void init_position_sensor();
+int16_t readAddress(uint16_t addr);
+int read_encoder();
 
-    boolean update_current_position(int microsteps);
-};
+void update_current_position(int microsteps);
 
 #endif
