@@ -1,0 +1,9 @@
+请确保您已经安装了驱动程序，请参阅页面底部：http://misfittech.net/product/nano-zero-stepper
+请注意，如果您已经安装了Arduino IDE套件驱动程序，应该安装。 
+
+一旦NZS插入USB后安装驱动程序，它应显示为串行/ COM端口。
+这个COM端口可以打开你喜欢的终端软件，我个人喜欢Teraterm，  https://ttssh2.osdn.JP/index.html.en  
+默认串行设置是115200波特，8个数据位，N-奇偶校验，1-停止位（8-N-1）。
+一旦终端打开了com端口，在终端上输入任意字符出现命令提示符“：>”，此时可以输入'help'（引号内的字符）来查看命令列表。 
+
+Trampas
